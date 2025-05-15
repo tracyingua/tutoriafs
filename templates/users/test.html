@@ -1,0 +1,255 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Details - {{ student.first_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/tutor_bookings_details.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Add jQuery for AJAX -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    {% include 'users/navigation.html' %}
+
+    <main class="container">
+
+        <!-- Back Button -->
+        <a href="{% url 'tutor_bookings' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Bookings
+        </a>
+
+        <!-- Page Title -->
+        <h1 class="page-title">
+            <i class="fas fa-user-graduate"></i> Bookings for {{ student.first_name }} {{ student.last_name }}
+        </h1>
+
+        <!-- Student Profile -->
+        <div class="student-profile">
+            {% if student.profile_photo %}
+                <img src="{{ student.profile_photo.url }}" alt="Student Photo" class="profile-image">
+            {% else %}
+                <img src="{% static 'images/default-profile.png' %}" alt="Default Photo" class="profile-image">
+            {% endif %}
+            <div class="profile-info">
+                <p><strong>Grade:</strong> {{ student.grade_level }}</p>
+                <p><strong>Gender:</strong> {{ student.gender }}</p>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <p><strong><i class="fas fa-list-ol"></i> Total Sessions:</strong> {{ total_sessions }}</p>
+            <p><strong><i class="fas fa-hourglass-half"></i> Total Duration:</strong> {{ total_duration }} hrs</p>
+            <p><strong><i class="fas fa-check-circle"></i> Completed Hours:</strong> {{ completed_hours }} hrs</p>
+            <p><strong><i class="fas fa-money-bill-wave"></i> Total Amount:</strong> ₱{{ total_amount|floatformat:2 }}</p>
+            <p><strong><i class="fas fa-hand-holding-usd"></i> Paid Amount:</strong> ₱{{ paid_amount|floatformat:2 }}</p>
+            <p class="{% if balance_due > 0 %}balance-due{% endif %}">
+                <strong><i class="fas fa-file-invoice-dollar"></i> Balance Due:</strong> ₱{{ balance_due|floatformat:2 }}
+            </p>
+        </div>
+
+        <div class="filter-section">
+            <h3><i class="fas fa-filter"></i> Filters</h3>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="declined">Declined</option>
+                        <option value="canceled">Canceled</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="dayFilter">Day:</label>
+                    <select id="dayFilter" class="filter-select">
+                        <option value="">All Days</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group"  style="display: none;">
+                    <label for="durationFilter">Duration:</label>
+                    <select id="durationFilter" class="filter-select">
+                        <option value="">All Durations</option>
+                        <option value="1">1.00</option>
+                        <option value="1.5">1.5 hours</option>
+                        <option value="2">2 hours</option>
+                        <option value="2.5">2.5 hours</option>
+                        <option value="3">3 hours</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="monthFilter">Month:</label>
+                    <select id="monthFilter" class="filter-select">
+                        <option value="">All Months</option>
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                </div>
+                
+                <button id="resetFilters" class="btn-reset">
+                    <i class="fas fa-redo"></i> Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Accept/Decline Modals -->
+        <div id="acceptModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Accept Booking</h3>
+                <form id="acceptForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="bookingId" name="booking_id">
+                    <div class="form-group">
+                        <label for="sessionTime">Session Time:</label>
+                        <input type="time" id="sessionTime" name="start_time" required>
+                    </div>
+                    <button type="submit" class="btn-accept">Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="declineModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Decline Booking</h3>
+                <p>Are you sure you want to decline this booking?</p>
+                <form id="declineForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="declineBookingId" name="booking_id">
+                    <button type="submit" class="btn-decline">Confirm </button>
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Complete/Cancel Modals -->
+        <div id="completeModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Complete Session</h3>
+               <p>Are you sure you want to mark this session as completed? Please make sure the other party has already made the payment before proceeding.</p>
+                <form id="completeForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="completeBookingId" name="booking_id">
+                    <button type="submit" class="btn-complete1">Confirm </button>
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="cancelModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Cancel Session</h3>
+                <p>Are you sure you want to cancel this session?</p>
+                <form id="cancelForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="cancelBookingId" name="booking_id">
+                    <button type="submit" class="btn-cancel1">Confirm</button>
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success/Error Modal -->
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="messageTitle">Title</h3>
+                <p id="messageContent">Message content goes here</p>
+                <button id="messageClose" class="btn-accept">OK</button>
+            </div>
+        </div>
+        <!-- Booking List -->
+       <!-- Booking List -->
+{% if bookings %}
+<div class="booking-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.subject.name }}</td>
+                    <td>{{ booking.date|date:"M d, Y" }}</td>
+                    <td>{{ booking.day_of_week }}</td>
+                    <td>{{ booking.display_start_time }}</td>
+                    <td>{{ booking.display_end_time }}</td>
+                    <td>{{ booking.duration }} hr</td>
+                    <td class="status">{{ booking.status|title }}</td>
+                    <td>
+                        {% if booking.tutor_schedule.status == 'confirmed' %}
+                            {% if booking.status == "pending" %}
+                                <button class="btn-accept1 accept-btn" data-booking-id="{{ booking.id }}">
+                                    Accept
+                                </button>
+                                <button class="btn-decline1 decline-btn" data-booking-id="{{ booking.id }}">
+                                    Decline
+                                </button>
+                            {% elif booking.status == "confirmed" %}
+                                <button class="btn-complete1 complete-btn" data-booking-id="{{ booking.id }}">
+                                    Complete
+                                </button>
+                                <button class="btn-cancel1 cancel-btn" data-booking-id="{{ booking.id }}">
+                                    Cancel
+                                </button>
+                            {% else %}
+                                -
+                            {% endif %}
+                        {% else %}
+                            <span class="schedule-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Schedule not confirmed 
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="no-sessions"><i class="fas fa-exclamation-circle"></i> No sessions found for this student.</p>
+{% endif %}
+    </main>
+
+    
+
+    
+</body>
+</html>

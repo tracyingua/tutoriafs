@@ -1,0 +1,41 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/feedback_modal.css' %}">
+
+{% if tutor %}
+    <form method="POST" action="{% url 'submit_feedback' tutor.id %}">
+{% else %}
+    <p>No tutor available for feedback.</p>
+{% endif %}
+
+  {% csrf_token %}
+  <div id="feedback-modal" class="feedback-modal">
+      <div class="feedback-modal-content">
+          <h2>Give Feedback</h2>
+          <p>How would you describe your experience with your tutor?</p>
+
+          <div class="star-rating">
+              <input type="hidden" name="rating" required id="rating-value">
+              <span class="star" data-value="1">★</span>
+              <span class="star" data-value="2">★</span>
+              <span class="star" data-value="3">★</span>
+              <span class="star" data-value="4">★</span>
+              <span class="star" data-value="5">★</span>
+          </div>
+
+          <div class="rating-labels">
+              <span>Terrible</span>
+              <span>Bad</span>
+              <span>Okay</span>
+              <span>Good</span>
+              <span>Amazing</span>
+          </div>
+
+          <textarea name="comment" id="feedback-comment"  required placeholder="What are the main reasons for your rating?"></textarea>
+
+          <div class="feedback-modal-buttons">
+              <button type="submit" class="feedback-buttons">SUBMIT</button>
+              <button type="button" class="feedback-buttons" id="cancel-feedback">CANCEL</button>
+          </div>
+      </div>
+  </div>
+</form>

@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutoria - Chat</title>
+  <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+  <meta name="csrfmiddlewaretoken" content="{{ csrf_token }}">
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+</head>
+
+<body>
+
+  {% include 'users/navigation.html' %}
+
+  <main class="chat-container">
+    <aside class="chat-sidebar">
+      <div class="chat-header">
+        <h2>Chats</h2>
+      </div>
+      <ul class="chat-list">
+        {% for chat_user in users %}
+          <li class="chat-item">
+            <a href="{% url 'start_conversation' chat_user.id %}" class="chat-item-link">
+              
+              <div class="chat-avatar">
+              
+                {% if chat_user.id in unread_message_user_ids %}
+                  <span class="unread-indicator"></span>
+                {% endif %}
+              </div>
+      
+              <div class="chat-info">
+                <h3>{{ chat_user.get_full_name|title }}</h3>
+               
+              </div>
+            </a>
+          </li>
+        {% empty %}
+          <div class="no-user-container">
+            {% if request.user.role == 'parent' %}
+              <p class="no-user">No Scheduled Tutor Available</p>
+            {% else %}
+              <p class="no-user">No Conversations Available</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </ul>
+      
+      
+      
+    </aside>
+
+    <section class="chat-main">
+      <header class="chat-main-header">
+        <div class="chat-main-info">
+          <h3>Chatting With: {{ chat_partner.get_full_name|title }}</h3> 
+        </div>
+    
+      </header>
+
+      <div class="chat-messages"
+           data-conversation-id="{{ selected_conversation.id }}"
+           data-current-user="{{ current_user_id }}">
+        {% for message in messages %}
+          <div class="message-container {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+            <p>{{ message.content }}</p>
+            <span class="timestamp">{{ message.timestamp|timesince }} </span>
+          </div>
+        {% empty %}
+          <div class="no-messages"></div>
+        {% endfor %}
+      </div>
+
+      <form id="chatForm" method="POST" action="{% url 'send_message' %}" onsubmit="return false;">
+        {% csrf_token %}
+        <div class="chat-input">
+          <button class="emoji-btn"></button>
+          <input type="text" class="message-box" id="messageInput" placeholder="Message Here">
+          <button class="photo-btn" id="photoBtn">
+            <img src="{% static 'images/camera.jfif' %}" alt="Send">
+          </button>
+          <button class="send-btn" id="sendBtn">
+            <img src="{% static 'images/plane.jfif' %}" alt="Send">
+          </button>
+        </div>
+      </form>
+
+      <input type="file" id="fileInput" accept="image/*" capture="camera" style="display: none;">
+      <input type="file" id="uploadInput" accept="image/*" style="display: none;">
+    </section>
+
+    <div id="imageModal" class="image-modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <img id="modalImage" src="" alt="Full size image">
+      </div>
+    </div>
+
+    <div id="popupModal" class="popup-modal" style="display: none;">
+      <div class="popup-content">
+        <h3>Choose an Option</h3>
+        <div class="popup-options">
+          <button id="cameraOption" class="popup-option">
+            <img src="{% static 'images/camera.jfif' %}" alt="Camera">
+            <p>Use Camera</p>
+          </button>
+          <button id="galleryOption" class="popup-option">
+            <img src="{% static 'images/gallery.jfif' %}" alt="Gallery">
+            <p>Upload Image</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-details">
+      <div class="chat-details-header">
+        <h3>Chat Info</h3>
+      </div>
+      <ul class="chat-details-list">
+        <li><a href="#" id="media-tab" class="tab-link active">Images</a></li>
+      </ul>
+      <div class="chat-details-content">
+        <div id="media-content" class="tab-content active">
+          {% if conversation_images %}
+            <h4>Images</h4>
+            <div class="media-gallery">
+              {% for image in conversation_images %}
+                {% if image %}
+                  <img src="{% get_media_prefix %}{{ image }}" 
+                       class="gallery-image"
+                       onclick="openImageModal('{% get_media_prefix %}{{ image }}')"
+                       style="width:100px; height:100px; margin:5px; cursor:pointer;">
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="{% static 'js/hamburger.js' %}"></script>
+  <script src="{% static 'js/user_chat.js' %}"></script>
+
+  <script>
+    const sendMessageUrl = "{% url 'send_message' %}";
+
+    function getCSRFToken() {
+      return document.querySelector('meta[name="csrfmiddlewaretoken"]').getAttribute('content');
+    }
+
+    function markMessagesAsRead(conversationId) {
+      fetch(`/mark-messages-as-read/${conversationId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(),
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Messages marked as read.');
+        }
+      })
+      .catch(error => {
+        console.error('Error marking messages as read:', error);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatLinks = document.querySelectorAll('.chat-item-link');
+      chatLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          const userId = this.dataset.userId;
+          
+    
+          fetch(`/mark-messages-as-read/${userId}/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCSRFToken(),
+            },
+          }).then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                
+                window.location.href = this.href;
+              }
+            })
+            .catch(error => {
+              console.error('Error marking messages as read:', error);
+              window.location.href = this.href; 
+            });
+        });
+      });
+
+    
+      const chatMessagesDiv = document.querySelector('.chat-messages');
+      const selectedConversationId = chatMessagesDiv?.dataset.conversationId;
+      if (selectedConversationId) {
+        markMessagesAsRead(selectedConversationId);
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+<style>
+  /* Add to your CSS */
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+
+
+
+.unread-indicator {
+  position: absolute;
+  top: 0;
+   margin-right: -10px!important;
+  left:0;
+  background-color: red;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+.chat-avatar {
+  position: relative;
+}
+
+
+.fa-envelope {
+  position: relative;
+}
+
+.fa-envelope.has-notifications::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff4757;
+  border-radius: 50%;
+  border: 2px solid #76aced;
+}
+
+.profile-icon {
+  position: relative;
+}
+
+.profile-icon .notification-count {
+  top: 0;
+  right: 0;
+}
+</style>

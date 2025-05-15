@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find a Tutor - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/find_tutor.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+</head>
+<body>
+
+  <style>
+    .subject-topics-wrapper {
+  margin-top: 1rem;
+}
+
+.toggle-topics-btn {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.toggle-topics-btn:hover {
+  background-color: #4338ca;
+}
+
+.subject-topic-list {
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.subject-block {
+  margin-bottom: 1rem;
+}
+
+.topic-list {
+  padding-left: 1rem;
+  list-style-type: circle;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.hidden {
+  display: none;
+}
+
+  </style>
+  
+
+ 
+ 
+  {% include 'users/navigation.html' %}
+  <main class="find-tutor">
+ 
+
+
+    <section class="student-selection">
+      {% if selected_student %}
+          <h2>Finding Tutor for: <span class="highlight">{{ selected_student.first_name }} {{ selected_student.last_name }}</span></h2>
+      {% else %}
+          <a href="{% url 'parent_profile' %}" class="select-student-btn">
+              <h2>SELECT STUDENT TO FIND A TUTOR</h2>
+          </a>
+      {% endif %}
+  </section>  
+
+  <section class="search-bar">
+    <div class="search-input">
+      <i class="fa fa-search"></i>
+
+      <input  type="text" placeholder="Search for an English Tutor" />
+    </div>
+    <div class="filter">
+      <label for="tutor-mode">Tutor Mode:</label>
+      <select id="tutor-mode" name="tutor_mode">
+        <option value="all" selected>All</option> 
+        <option value="online">Online</option>
+        <option value="in-person">In-Person</option>
+        <option value="both">Online and Offline</option>
+      </select>
+    </div>
+
+
+
+    
+    <div class="filter-container">
+      <button class="filter-btn" onclick="toggleFilter()">
+          <i class="fas fa-filter"></i> Filter Subjects
+      </button>
+      <div id="subject-filter" class="subject-dropdown">
+     
+    
+        {% for subject in all_subjects %}
+            <label>
+                <input type="checkbox" name="subject" value="{{ subject.name|lower }}">
+                {{ subject.name|cut:" (ESP)"|cut:" (ARPAN)"|cut:" (Music, Arts, Physical Education, and Health)" }}
+            </label>
+        {% endfor %}
+    </div>
+    
+    
+  </div>
+  
+    
+  </section>
+
+
+
+
+
+  
+  <section class="recommendations">
+    <p><i class="pin-icon"></i> Below is a list of recommended tutors based on your selected student's assessment and grade level (Grade {{ selected_student.grade_level }}).</p>
+  
+    
+    <div class="tutor-card-container">
+      {% for tutor in tutors %}
+      <div class="tutor-card" data-tutor-id="{{ tutor.tutor.id }}" data-mode="{{ tutor.tutor.tutoring_type }}">
+
+          <div class="tutor-info">
+         
+            {% if tutor.tutor.profile_photo %}
+    <img src="{{ tutor.tutor.profile_photo.url }}" alt="Profile photo of {{ tutor.tutor.name }}" class="tutor-photo">
+{% else %}
+    <img src="{% static 'images/svg/user.svg'}" alt="Default profile photo" class="tutor-photo">
+{% endif %}
+            <div class="tutor-details">
+
+               <p style="font-size: 1.5rem; font-weight: 600;" > Name: {{ tutor.tutor.user.first_name |title }} {{ tutor.tutor.user.middle_name|title }} {{ tutor.tutor.user.last_name  |title}}
+              </p>
+              <h3>TEACHES: 
+                {% with tutor.tutor.subjects.all as all_subjects %}
+                  {% with all_subjects|slice:":3" as first_three %}
+                    <span id="subjects-short-{{ tutor.tutor.id }}">
+                      {% for subject in first_three %}
+                        {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    </span>
+              
+                    <span id="subjects-full-{{ tutor.tutor.id }}" style="display: none;">
+                      {% for subject in all_subjects %}
+                          {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                  </span>
+                    {% if all_subjects|length > 3 %}
+                      <button class="view-more-btn" onclick="toggleSubjects('{{ tutor.tutor.id }}')" id="toggle-subjects-btn-{{ tutor.tutor.id }}">
+                        +{{ all_subjects|length|add:"-3" }} more
+                      </button>
+                    {% endif %}
+                  {% endwith %}
+                {% endwith %}
+              </h3>
+
+              <div class="subject-topics-wrapper">
+                <button class="toggle-topics-btn" onclick="toggleSubjectTopics('{{ tutor.tutor.id }}')">
+                  Show  Topics
+                </button>
+              
+                <div id="subject-topics-{{ tutor.tutor.id }}" class="subject-topic-list hidden">
+                  {% for subject in tutor.tutor.subjects.all %}
+                    <div class="subject-block">
+                      <strong>{{ subject.name }}</strong>
+                      <ul class="topic-list">
+                        {% with subject.topics.all as related_topics %}
+                          {% if related_topics %}
+                            {% for topic in related_topics %}
+                              <li>{{ topic.name }}</li>
+                            {% endfor %}
+                          {% else %}
+                            <li><em>No topics listed</em></li>
+                          {% endif %}
+                        {% endwith %}
+                      </ul>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+
+              <p>Match Score: {{ tutor.match_score|floatformat:1 }}%</p>
+              <p>Grade Levels: 
+                {% for grade in tutor.tutor.grade_levels.all %}
+                  {{ grade.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  Not Specified
+                {% endfor %}
+              </p>
+              
+           
+
+              <p>Tutoring Mode: 
+                {% if tutor.tutor.tutoring_type == "online" %}
+                    Online 
+                {% elif tutor.tutor.tutoring_type == "in-person" %}
+                    In-Person 
+                {% elif tutor.tutor.tutoring_type == "both" %}
+                    Both Online & In-Person
+                {% else %}
+                    Not Specified
+                {% endif %}
+              </p>
+              <p> Review: {{ tutor.tutor.average_rating|floatformat:1 }} ({{ tutor.tutor.reviews.count }} reviews)</p>
+            </div>
+          </div>
+  <div class="pricing">
+            <a href="{% url 'teacher_profile' tutor.tutor.id %}">
+              <button>Schedule Tutor</button>
+            </a>
+          </div>
+        </div>
+      {% empty %}
+        <p>No recommended tutors found for this student.</p>
+      {% endfor %}
+    </div>
+    
+    </div>
+  </section>
+  
+  </main>
+
+ 
+  
+  <script src="{% static 'js/hamburger.js' %}"></script>
+  <script src="{% static 'js/find_tutor.js' %}"></script>
+
+
+
+  <script>
+    function toggleSubjectTopics(tutorId) {
+      const topicsDiv = document.getElementById(`subject-topics-${tutorId}`);
+      const btn = document.querySelector(`[onclick="toggleSubjectTopics('${tutorId}')"]`);
+      
+      if (topicsDiv.classList.contains('hidden')) {
+        topicsDiv.classList.remove('hidden');
+        btn.textContent = "Hide Topics";
+      } else {
+        topicsDiv.classList.add('hidden');
+        btn.textContent = "Show Topics";
+      }
+    }
+
+    document.getElementById("tutor-mode").addEventListener("change", function () {
+    const selectedMode = this.value;
+    const tutorCards = document.querySelectorAll(".tutor-card");
+
+    tutorCards.forEach((card) => {
+      const mode = card.getAttribute("data-mode");
+      
+      if (selectedMode === "all" || mode === selectedMode || (selectedMode === "both" && mode === "both")) {
+        card.style.display = "flex";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  });
+  
+  </script>
+  
+
+
+  
+  </body>
+  </html>

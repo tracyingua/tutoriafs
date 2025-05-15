@@ -1,0 +1,66 @@
+{% block content %}
+<div class="container">
+    <h2>Link Student & Tutor Assessment Questions</h2>
+
+    <!-- Display success or error messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label for="student_question">Select Student Question:</label>
+        <select name="student_question" id="student_question" required>
+            <option value="" disabled selected>-- Select a Student Question --</option>
+            {% for question in student_questions %}
+                <option value="{{ question.id }}">{{ question.question_text }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="tutor_question">Select Tutor Question:</label>
+        <select name="tutor_question" id="tutor_question" required>
+            <option value="" disabled selected>-- Select a Tutor Question --</option>
+            {% for question in tutor_questions %}
+                <option value="{{ question.id }}">{{ question.question_text }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Link Questions</button>
+    </form>
+
+    <hr>
+
+    <h3>Existing Linked Questions & Choices</h3>
+    <ul>
+        {% for tutor_question in tutor_questions %}
+            {% if tutor_question.linked_student_question %}
+                <li>
+                    <strong>{{ tutor_question.question_text }}</strong>
+                    → Linked to: <em>{{ tutor_question.linked_student_question.question_text }}</em>
+    
+                    <ul>
+                        {% for tutor_choice in tutor_question.choices.all %}
+                            <li>
+                                <strong>{{ tutor_choice.text }}</strong>
+                                → Linked to: 
+                                {% if tutor_choice.linked_student_answer %}
+                                    <em>{{ tutor_choice.linked_student_answer.text }}</em>
+                                {% else %}
+                                    ❌ Not linked
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    
+
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/edit_tutor_profile.css' %}">
+
+<style>
+    #submit-button {
+    position: relative;
+}
+
+#submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.loading-spinner {
+    margin-left: 8px;
+}
+</style>
+
+<div id="edit-profile-modal" class="modal" style="  display: none; " >
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('edit-profile-modal')">&times;</span>
+        <h3>Edit Profile Information</h3>
+        
+        <form id="edit-profile-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+
+            <input type="hidden" id="removed-credentials" name="removed_credentials">
+
+            <!-- Subjects -->
+            <label>Subjects:</label>
+            <select id="subjects" name="subjects[]" multiple class="multi-select"
+                    data-selected='{{ selected_subjects|safe }}'>
+                {% for subject in all_subjects %}
+                    <option value="{{ subject.id }}" {% if subject.id in selected_subjects %}selected{% endif %}>
+                        {{ subject.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <!-- Topics -->
+            <label>Topics:</label>
+            <select id="topics" name="topics[]" multiple class="multi-select"
+                    data-selected='{{ selected_topics|safe }}'>
+                {% for topic in all_topics %}
+                    <option value="{{ topic.id }}" {% if topic.id in selected_topics %}selected{% endif %}>
+                        {{ topic.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <!-- Subtopics -->
+            <label>Subtopics:</label>
+            <select id="subtopics" name="subtopics[]" multiple class="multi-select"
+                    data-selected='{{ selected_subtopics|safe }}'>
+                {% for subtopic in all_subtopics %}
+                    <option value="{{ subtopic.id }}" {% if subtopic.id in selected_subtopics %}selected{% endif %}>
+                        {{ subtopic.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Tutoring Type -->
+            <label for="tutoring-type">Tutoring Type:</label>
+            <select id="tutoring_type" name="tutoring_type">
+                <option value="online" {% if tutor.tutoring_type == "online" %}selected{% endif %}>Online Tutoring</option>
+                <option value="in-person" {% if tutor.tutoring_type == "in-person" %}selected{% endif %}>In-Person Tutoring</option>
+                <option value="both" {% if tutor.tutoring_type == "both" %}selected{% endif %}>Both Online & In-Person</option>
+            </select>
+
+            <!-- GCASH Number -->
+            <label>Phone Number:</label>
+            <input type="text" id="phone_number" name="phone_number" value="{{ tutor.user.phone_number }}">
+
+
+            <label>Grade levels:</label>
+            <select id="grade_levels" name="grade_levels[]" multiple class="multi-select"
+                    data-selected='{{ selected_grade_levels|safe }}'>
+                <!-- Options will be populated dynamically via JavaScript -->
+            </select>
+            
+
+            
+        <!-- Credentials Upload -->
+<label>Upload Credentials:</label>
+<input type="file" id="file-input" multiple style="display: none;">
+<button type="button" id="add-files">Add Files</button>
+
+<!-- Preview Selected Files -->
+<div id="file-preview"></div>
+
+
+<div class="existing-credentials">
+    <h4>Existing Credentials</h4>
+    <ul class="credentials-list">
+        {% for credential in credentials %}
+            <li>
+                <i class="file-icon fas 
+                    {% if credential.document.name|slice:"-3:" == "pdf" %}
+                        fa-file-pdf
+                    {% elif credential.document.name|slice:"-4:" == "docx" %}
+                        fa-file-word
+                    {% else %}
+                        fa-file-alt
+                    {% endif %}
+                "></i>
+
+                <a href="{{ credential.document.url }}" target="_blank">
+                    {{ credential.document.name }}
+                </a>
+
+                <button type="button" class="remove-credential" data-id="{{ credential.id }}">
+                   </i> Remove
+                </button>
+            </li>
+        {% empty %}
+            <p>No credentials uploaded yet.</p>
+        {% endfor %}
+    </ul>
+</div>
+
+
+<button type="submit" class="save-button" id="submit-button">
+    <span class="button-text">Save Changes</span>
+    <span class="loading-spinner" style="display: none;">
+
+        <i class="fas fa-spinner fa-spin"></i>
+    </span>
+</button>
+        </form>
+    </div>
+</div>
+
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script src="{% static 'js/edit_tutor_information.js' %}"></script>
+
+<script>
+    var getTopicsUrl = "{% url 'get_topics_for_subjects' %}";
+    var editProfileUrl = "{% url 'update_tutor_profile' %}";
+
+
+    
+
+
+</script>

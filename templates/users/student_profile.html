@@ -1,0 +1,242 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Profile</title>
+    <link rel="stylesheet" href="{% static 'css/student_profile.css' %}" />
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  </head>
+
+
+  {% include 'users/navigation.html' %}
+  <body>
+
+    <section class="back-button-wrapper"> 
+        <button class="back-button" onclick="goBack()">
+          <i class="fas fa-arrow-left"></i>
+          Back
+        </button>
+      </section>
+    <div class="student-profile-container">
+     
+
+      <div class="student-left">
+        <h2 class="student-heading">Student Profile</h2>
+        <div class="student-image1">
+            <img src="{% if student.profile_photo %}{{ student.profile_photo.url }}{% else %}{% static 'images/svg/users.svg' %}{% endif %}" alt="Student Profile" />
+
+        </div>
+        <p class="student-name">
+            {{ student.first_name }}  
+            {% if student.middle_name %}
+                {{ student.middle_name | title }}  
+            {% endif %}
+            {{ student.last_name | title }}
+        </p>
+        
+        <p class="student-email">{{ student.email }}</p>
+        <p class="student-info">Grade Level: {{ student.grade_level }}</p>
+        <p class="student-info">Gender: {{ student.get_gender_display }}</p>
+        <p class="student-info">Birthday: {{ student.birthday|date:"F d, Y" }}</p>
+        <p class="student-info">Home Address:{{ student.street | title }}, {{ student.barangay | title }}</p>
+        <a href="{% url 'edit_student' student.id %}" class="next-btn">Edit</a>
+        <a href="" class="next-btn">Next</a>
+      </div>
+
+      <div class="student-right">
+        <h3 class="section-title-top">Subjects and Tutors</h3>
+        <div class="subject-table-container">
+          <table class="subject-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Tutor</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for schedule in grouped_schedules %}
+              <tr>
+                  <td>{{ schedule.subject }}</td>
+                  <td class="tutor-name"><a href="{% url 'teacher_profile' schedule.tutor.id %}">{{ schedule.tutor.user.first_name }} {{schedule.tutor.user.last_name}}</a></td>
+                  <td>{{ schedule.start_date|date:"F d, Y" }}</td>
+                  <td>{{ schedule.end_date|date:"F d, Y" }}</td>
+                  <td id="status" class="status-{{ schedule.status }}">{{ schedule.status|capfirst }}</td>
+                  <td>
+                    {% if schedule.subject_id %}
+                        <div class="withdraw-session-row">
+                            <a href="{% url 'student_sessions' student.id schedule.subject_id %}" class="see-session"> View Sessions</a>
+                            {% if schedule.status != 'withdrawn' and schedule.status != 'completed' %}
+                                <button class="withdraw-btn" data-schedule-id="{{ schedule.id }}">Withdraw</button>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        No sessions
+                    {% endif %}
+                </td>
+                
+                  
+              </tr>
+          {% empty %}
+              <tr>
+                  <td colspan="6">No assigned schedules yet.</td>   
+              </tr>
+          {% endfor %}
+            </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdraw Confirmation Modal -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+          
+            <h3>Withdraw Schedule</h3>
+            <p>Are you sure you want to withdraw this schedule? This action cannot be undone.</p>
+            <form id="withdrawForm">
+                {% csrf_token %}
+                <input type="hidden" id="withdrawScheduleId" name="schedule_id">
+                <div class="form-group" style="display: none;">
+                    <label for="withdrawReason"  style="display: none;">Reason (optional):</label>
+                    <textarea style="display: none;" id="withdrawReason" name="reason" rows="3" style="width: 100%; padding: 8px;"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-confirm">Confirm </button>
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="messageTitle"></h3>
+            <p id="messageContent"></p>
+            <div class="modal-buttons">
+                <button id="messageClose" class="btn-confirm">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize modals
+            const withdrawModal = $('#withdrawModal');
+            const messageModal = $('#messageModal');
+            const closeBtns = $('.close');
+            const cancelBtn = $('.btn-cancel');
+            
+            // Show withdraw modal when withdraw button is clicked
+           // Update the withdraw button click handler
+           $('.withdraw-btn').click(function() {
+    const scheduleId = $(this).data('schedule-id');
+    console.log("Schedule ID:", scheduleId);  // Debugging
+    if (!scheduleId) {
+        showMessage("Error", "Invalid schedule ID");
+        return;
+    }
+    $('#withdrawScheduleId').val(scheduleId);
+    withdrawModal.show();
+});
+            
+            // Close modals when close buttons are clicked
+            closeBtns.add(cancelBtn).click(function() {
+                withdrawModal.hide();
+                messageModal.hide();
+            });
+            
+            // Close modals when clicking outside
+            $(window).click(function(event) {
+                if ($(event.target).hasClass('modal')) {
+                    withdrawModal.hide();
+                    messageModal.hide();
+                }
+            });
+            
+            // Withdraw form submission
+            $('#withdrawForm').submit(function(e) {
+    e.preventDefault();
+    const scheduleId = $('#withdrawScheduleId').val();
+    
+    // Validate the schedule ID
+    if (!scheduleId || isNaN(scheduleId)) {
+        showMessage("Error", "Please select a valid schedule");
+        return;
+    }
+
+    const $withdrawBtn = $(`button[data-schedule-id="${scheduleId}"]`);
+    const formData = {
+        'schedule_id': scheduleId,
+        'reason': $('#withdrawReason').val(),
+        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+    };
+    
+    $.ajax({
+        url: "{% url 'withdraw_schedule' %}",
+        method: "POST",
+        data: formData,
+        beforeSend: function() {
+            $withdrawBtn.prop('disabled', true).text('Processing...');
+        },
+        success: function(response) {
+            if (response.success) {
+                // Update UI
+                const $row = $withdrawBtn.closest('tr');
+                $row.find('td:nth-child(5)')
+                    .text('Withdrawn')
+                    .removeClass()
+                    .addClass('status-withdrawn');
+                
+                $withdrawBtn.remove();
+                
+                withdrawModal.hide();
+                showMessage("Success", response.message);
+            } else {
+                showMessage("Error", response.error);
+                $withdrawBtn.prop('disabled', false).text('Withdraw');
+            }
+        },
+        error: function(xhr) {
+            showMessage("Error", xhr.responseJSON?.error || "An error occurred");
+            $withdrawBtn.prop('disabled', false).text('Withdraw');
+        }
+    });
+});
+
+            
+            // Show message function
+            function showMessage(title, content, reload = false) {
+                $('#messageTitle').text(title);
+                $('#messageContent').text(content);
+                messageModal.show();
+                
+                if (reload) {
+                    $('#messageClose').one('click', function() {
+                        location.reload();
+                    });
+                }
+            }
+            
+            // Close message modal when OK button is clicked
+            $('#messageClose').click(function() {
+                messageModal.hide();
+            });
+        });
+        
+        function goBack() {
+            window.location.href = "{% url 'parent_profile' %}"
+        }
+    </script>
+  </body>
+</html>

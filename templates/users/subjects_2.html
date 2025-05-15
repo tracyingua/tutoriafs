@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subjects - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/subject_2.css' %}">
+  
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+</head>
+
+<body>
+  {% include 'users/navigation.html' %}
+
+  <main class="subjects-page">
+
+    <section class="back-button-wrapper">
+      <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+    </section>
+    
+    <section class="search-bar">
+      <div class="search-input">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" placeholder="Search for Topics" />
+      </div>
+    </section>
+
+    <section class="language-filter">
+      <button class="language-btn">
+        <img src="{% static 'images/svg/language.svg' %}" alt="Subject Icon" class="language-icon">
+        {{ subject.name }}
+    </button>
+    
+      </section>
+      
+
+      <section class="subject-list">
+        {% for topic in topics %}
+          <div class="subject-item">
+            <img src="{% static 'images/svg/book.svg' %}" alt="Topic Icon" class="subject-icon">
+            <div class="subject-info">
+              <h3>{{ topic.name }}</h3>
+              <p>{{ topic.description }}</p>
+            </div>
+            <button class="find-tutor-btn" onclick="redirectToFindTutor('{{ topic.id }}')">
+              Find Tutor
+            </button>
+            
+          </div>
+        {% empty %}
+          <p>No topics available for this subject.</p>
+        {% endfor %}
+      </section>
+      
+  </main>
+
+  <script src="{% static 'js/subjects_2.js' %}"></script>
+  <script src="{% static 'js/hamburger.js' %}"></script>
+
+  <script>
+     function goBack(){
+
+
+window.location.href = "{% url 'subjects' %}";
+}
+
+function redirectToFindTutor(topicId) {
+    window.location.href = "{% url 'find_tutor' %}?topic=" + topicId;
+  }
+  </script>
+
+
+  
+</body>
+</html>

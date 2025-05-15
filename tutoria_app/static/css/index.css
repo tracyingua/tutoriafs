@@ -1,0 +1,235 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f3ff;
+    padding: 10px 5%;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+}
+
+.logo a {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 30px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-family: 'TT Bluescreens', sans-serif;
+    font-size: 20px;
+    color: #333;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px 15px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    height: 25px;
+}
+
+.hamburger-menu .bar {
+    width: 30px;
+    height: 3px;
+    background-color: #333;
+    border-radius: 5px;
+}
+
+.auth-buttons {
+    min-width: 200px;
+    text-align: right;
+    display: flex;
+    gap: 10px;
+}
+
+.auth-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.auth-buttons .signup {
+    background-color: #c4c5c6;
+    color: #000;
+}
+
+.auth-buttons .login {
+    background-color: #ddc8d5;
+    color: #000;
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 100px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.intro {
+    max-width: 600px;
+}
+
+.intro h1 {
+    font-family: 'TT Bluescreens', sans-serif;
+    font-weight: bold;
+  
+    text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5); 
+    font-size: 72px;
+    color: #d269e6;
+    text-transform: uppercase;
+}
+
+.intro p {
+    
+    font-size: 20px;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.action-buttons button {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.action-buttons .find-tutor, .action-buttons .become-tutor {
+    background-color: #ddc8d5;
+    color: #000000;
+}
+
+.action-buttons button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.image-section {
+    max-width: 1000px;
+    text-align: center;
+}
+
+.student-image {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    border: 5px solid #78a6dd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: rotate(-5deg);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 80px 5%;
+    }
+    
+    .intro {
+        max-width: 90%;
+    }
+    
+    .image-section {
+        margin-top: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 10px;
+        background-color: #f9f3ff;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 200px;
+    }
+
+    .nav a {
+        margin: 10px 0;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .nav.show {
+        display: flex;
+    }
+
+    .hamburger-menu {
+        display: flex;
+    }
+    
+    
+
+    .student-image {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro h1 {
+        font-size: 48px;
+    }
+    
+    .intro p {
+        font-size: 18px;
+    }
+
+    .action-buttons {
+       display: flex;
+      
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+}

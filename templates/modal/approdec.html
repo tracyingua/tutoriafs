@@ -1,0 +1,21 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/approdec.css' %}" />
+
+
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <p id="confirmText">Are you sure?</p>
+        <div class="modal-buttons">
+            <button id="confirmAction" class="confirm-btn">Confirm</button>
+            <button id="cancelAction" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="successModal" class="message-modal">
+    <div class="modal-content">
+        <p id="successMessage"></p>
+        <button id="closeSuccessModal" class="confirm-btn">OK</button>
+    </div>
+</div>

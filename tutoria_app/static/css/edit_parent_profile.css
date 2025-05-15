@@ -1,0 +1,265 @@
+body {
+    background-color: #f5f6fa;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.edit-profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ 
+    padding: 20px;  
+}
+
+.edit-profile-wrapper {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 600px; 
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.profile-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    margin-bottom: 10px;
+}
+
+
+.change-photo-btn {
+    background-color: #6da9ff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; 
+}
+
+
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+label {
+    text-align: left;
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f1f1f1;
+    font-size: 14px;
+}
+
+input::placeholder {
+    color: #aaa;
+}
+
+
+.save-btn {
+    background-color: #6da9ff;
+    color: black;
+    border: none;
+    margin-left: 20px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.save-btn:hover {
+    background-color: #5599ee;
+}
+
+
+#id_profile_photo {
+    display: none;
+  }
+  
+
+  .custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6da9ff;
+
+    color: black;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+    transition: 0.3s ease;
+  }
+  
+  .custom-file-upload:hover {
+    transform: scale(1.1);
+  
+   
+  }
+  
+
+  .custom-file-upload i {
+    margin-right: 8px;
+  }
+
+
+ 
+.modal {
+ 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); 
+    backdrop-filter: blur(5px); 
+    z-index: 1001; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+  }
+  
+
+  .close-modal {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .close-modal:hover {
+    background: #0056b3;
+  }
+                                                                            
+
+  .back-button {
+    background-color: 
+    #5AA9FF;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .back-button i {
+    margin-right: 8px;
+  }
+  
+  .back-button:hover {
+    background-color: #3b8edb;
+  }
+  
+  
+
+@media screen and (max-width: 768px) {
+    .edit-profile-wrapper {
+        width: 90%; 
+        padding: 20px;
+    }
+
+
+    input {
+        width: 90%;
+    }
+    
+    .profile-photo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .save-btn{
+
+        width: 90%;
+    }
+
+    .change-photo-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .edit-profile-form {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .profile-section {
+        flex-direction: column; 
+        gap: 10px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    input {
+        padding: 10px;
+    }
+
+    .save-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+}

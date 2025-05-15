@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/index.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}">
+</head>
+<body>
+  <!-- Header Section -->
+  {% include 'users/header.html' %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="intro">
+      <h1 style="color: #76aced;">TUTORIA</h1>
+      <p>
+        We connect children with outstanding online tutors, helping them unlock their full potential. 
+        Our aim is to empower kids through personalized, high-quality education.
+      </p>
+      <div class="action-buttons">
+        <button style="background-color: #76aced;" class="find-tutor" onclick="start()">GET STARTED </button>
+        <button 
+        style="background-color: #76aced;" 
+        class="find-tutor" 
+        onclick="redirectToGmail()"
+      >
+        CONTACT ADMIN
+      </button>
+      
+      </div>
+    </section>
+    <div class="image-section">
+      <img  style="  border: 5px solid #78a6dd;" src="{% static 'images/blue.png' %}" alt="Student studying online" class="student-image">
+      <div class="circle-decor"></div>
+    </div>
+  </main>
+
+
+  <script src="{% static 'js/index.js' %}"></script>
+<script>
+     function signin(){
+
+window.location.href = "{% url 'signin' %}"
+
+
+}
+
+
+function signup(){
+
+window.location.href = "{% url 'signup' %}"
+
+
+}
+
+function start(){
+  window.location.href ="{% url 'signin' %}"
+}
+
+
+  function redirectToGmail() {
+    window.open(
+      "https://mail.google.com/mail/?view=cm&fs=1&to=tutoriafs2024@gmail.com&su=Tutoria%20Inquiry&body=Hello%20Tutoria%20Team,", 
+      "_blank"
+    );
+  }
+
+
+</script>
+
+
+  </script>
+</body>
+</html>

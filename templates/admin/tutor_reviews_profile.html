@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Profile | Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="{% static 'images/owl.png' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_student_parent.css' %}">
+    <style>
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 0.5rem;
+        }
+        
+        .rating-display .stars {
+            color: #ffc107;
+        }
+        
+        .rating-value {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .review-count {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+        
+        .tutoring-type {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: #e2e3e5;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #383d41;
+            margin-top: 0.5rem;
+        }
+        
+        .subjects-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .subject-tag {
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .availability-list {
+            margin-top: 1rem;
+        }
+        
+        .availability-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .availability-item:last-child {
+            border-bottom: none;
+        }
+        
+        .availability-day {
+            font-weight: 500;
+        }
+        
+        .availability-time {
+            color: var(--gray-color);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .btn i {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    {% include 'admin/sidebar.html' %}
+
+    <div class="dashboard-container">
+        <a href="{% url 'reviews' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Tutors List
+        </a>
+        
+        <div class="dashboard-header">
+            <h1><i class="fas fa-chalkboard-teacher"></i> Tutor Profile</h1>
+        </div>
+
+        <div class="parent-profile">
+            <div class="parent-header">
+                {% if tutor.profile_photo %}
+                    <img src="{{ tutor.profile_photo.url }}" class="parent-avatar" alt="{{ tutor.user.get_full_name }}">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.jpg' %}" class="parent-avatar" alt="Default avatar">
+                {% endif %}
+                <div class="parent-info">
+                    <h2>{{ tutor.user.get_full_name }}</h2>
+                    <div class="parent-meta">
+                        <span><i class="fas fa-user"></i> {{ tutor.user.get_gender_display }}</span>
+                        <span><i class="fas fa-phone"></i> {{ tutor.user.phone_number|default:"No phone number" }}</span>
+                        <span><i class="fas fa-envelope"></i> {{ tutor.user.email }}</span>
+                    </div>
+                    
+                    <div class="rating-display">
+                        <div class="stars">
+                            {% with tutor.average_rating|floatformat:0 as stars %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= stars %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <span class="rating-value">{{ tutor.average_rating|floatformat:1 }}</span>
+                        <span class="review-count">({{ tutor.reviews_count }} reviews)</span>
+                    </div>
+                    
+                    <span class="tutoring-type">
+                        <i class="fas fa-chalkboard"></i> {{ tutor.get_tutoring_type_display }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="parent-details">
+                <div class="detail-card">
+                    <span class="detail-label">Username</span>
+                    <span class="detail-value">{{ tutor.user.username }}</span>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-label">Account Status</span>
+                    <span class="detail-value">
+                        {% if tutor.user.is_active %}
+                            <span style="color: green;">Active</span>
+                        {% else %}
+                            <span style="color: red;">Inactive</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-label">Date Joined</span>
+                    <span class="detail-value">{{ tutor.user.date_joined|date:"M d, Y" }}</span>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value">
+                        {{ tutor.user.street }}, {{ tutor.user.barangay }}, {{ tutor.user.city }}
+                    </span>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-label">Subjects</span>
+                    <div class="subjects-list">
+                        {% for subject in tutor.subjects.all %}
+                            <span class="subject-tag">{{ subject.name }}</span>
+                        {% empty %}
+                            <span class="detail-value">No subjects assigned</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-label">Availability</span>
+                    <div class="availability-list">
+                        {% if tutor.availability_times.all %}
+                            {% for availability in tutor.availability_times.all %}
+                                <div class="availability-item">
+                                    <span class="availability-day">{{ availability.get_day_display }}</span>
+                                    <span class="availability-time">
+                                        {{ availability.start_time|time:"g:i A" }} - {{ availability.end_time|time:"g:i A" }}
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <span class="detail-value">No availability set</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="students-section">
+            <h3><i class="fas fa-star"></i> Recent Reviews</h3>
+            
+            {% if reviews %}
+                <div class="students-list">
+                    {% for review in reviews|slice:":3" %}
+                    <div class="student-card">
+                        <div class="student-header">
+                            {% if review.parent.profile_photo %}
+                                <img src="{{ review.parent.profile_photo.url }}" class="student-avatar" alt="{{ review.parent.get_full_name }}">
+                            {% else %}
+                                <img src="{% static 'images/default_avatar.jpg' %}" class="student-avatar" alt="Default avatar">
+                            {% endif %}
+                            <div class="student-info">
+                                <h4>{{ review.parent.get_full_name }}</h4>
+                                <div class="student-meta">
+                                    <span>{{ review.created_at|date:"M d, Y" }}</span>
+                                    <div class="rating-display">
+                                        <div class="stars">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="student-details">
+                            <div class="detail-row">
+                                <p>{{ review.comment|truncatechars:150 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if reviews.count > 3 %}
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <a href="{% url 'tutor_reviews_detail' tutor.id %}" class="btn">
+                            <i class="fas fa-comments"></i> View All Reviews
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="no-results">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>No reviews yet for this tutor.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

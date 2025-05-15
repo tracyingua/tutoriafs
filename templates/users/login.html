@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Tutoria</title>
+    <link rel="stylesheet" href="{% static 'css/signin.css' %}" />
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+  </head>
+  <body>
+    {% include 'users/header.html' %}
+
+    <main class="create-account">
+      <div class="signup-container">
+        <div class="signup-welcome">
+          <h2>Welcome back to <span class="brand-name">Tutoria</span></h2>
+          <p>
+            Log in to continue and connect with the perfect tutor for your
+            learning goals.
+          </p>
+          <img
+            src="{% static 'images/owl.png' %}"
+            alt="Welcome to Tutoria"
+            class="owl-icon"
+          />
+        </div>
+        <div class="signup-form">
+          <h3>Log in</h3>
+          <p>Access your account by entering your credentials below.</p>
+
+          {% if error %}
+          <div class="error-messages">
+            <h4 class="error-title">{{ error_title }}</h4>
+            <p class="error-text">{{ error_message }}</p>
+          </div>
+          {% endif %}
+
+          <form action="{% url 'signin' %}" method="post">
+            {% csrf_token %}
+            <label for="email">Email or Username</label>
+            <input type="text" id="email" name="email" required />
+
+            <label for="password">Password</label>
+<div class="password-container">
+  <input type="password" id="password" name="password" required />
+  <span class="toggle-password">
+    <img src="{% static 'images/svg/eye1.svg' %}" id="eye-icon"  class="show-password" />
+  </span>
+  
+</div>
+
+
+            <button type="submit" class="btn-primary">LOGIN</button>
+          </form>
+
+          <div class="login-links">
+            <span class="forgot"
+              ><a href="{% url 'forgot' %}">Forgot Password?</a></span
+            >
+            <span class="signup"><a href="{% url 'signup' %}">Sign-up</a></span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <script src="{% static 'js/index.js' %}"></script>
+
+    <script>
+      function signin() {
+        window.location.href = "{% url 'signin' %}";
+      }
+
+      function signup() {
+        window.location.href = "{% url 'signup' %}";
+      }
+
+ 
+      document.addEventListener("DOMContentLoaded", function () {
+    const passwordField = document.getElementById("password");
+    const togglePassword = document.querySelector(".toggle-password");
+    const eyeIcon = document.getElementById("eye-icon");
+
+
+    function isEdgeBrowser() {
+      return /Edg\//.test(navigator.userAgent);
+    }
+
+ 
+    if (isEdgeBrowser()) {
+      togglePassword.style.display = "none";
+      return; 
+    }
+
+  
+    function checkPasswordInput() {
+      if (passwordField.value.length > 0) {
+        eyeIcon.style.display = "block"; 
+      } else {
+        eyeIcon.style.display = "none"; 
+      }
+    }
+
+
+    passwordField.addEventListener("input", checkPasswordInput);
+
+   
+    togglePassword.addEventListener("click", function () {
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eyeIcon.src = "{% static 'images/svg/eye2.svg' %}"; 
+      } else {
+        passwordField.type = "password";
+        eyeIcon.src = "{% static 'images/svg/eye1.svg' %}";
+      }
+    });
+
+
+    checkPasswordInput();
+  });
+
+
+  
+
+    </script>
+  </body>
+</html>

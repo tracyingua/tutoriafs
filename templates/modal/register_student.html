@@ -1,0 +1,63 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/edit_parent_profile.css' %}" />
+
+<!-- Success Modal for Student Registration -->
+<div id="student-registration-modal" style="display: none;" class="modal" 
+     data-show="{% if messages %}{% for message in messages %}{% if 'student_registration_success' in message.tags %}true{% endif %}{% endfor %}{% endif %}">
+  <div class="modal-content">
+    {% for message in messages %}
+      {% if 'student_registration_success' in message.tags %}
+        <p>{{ message }}</p>
+      {% endif %}
+    {% endfor %}
+    <button class="close-modal" onclick="closeStudentModal()">OK</button>
+  </div>
+</div>
+
+<!-- Success Modal for Profile Editing -->
+<div id="profile-edit-modal" style="display: none;" class="modal" 
+     data-show="{% if messages %}{% for message in messages %}{% if 'edit_profile_success' in message.tags %}true{% endif %}{% endfor %}{% endif %}">
+  <div class="modal-content">
+    {% for message in messages %}
+      {% if 'edit_profile_success' in message.tags %}
+        <p>{{ message }}</p>
+      {% endif %}
+    {% endfor %}
+    <button class="close-modal" onclick="closeProfileModal()">OK</button>
+  </div>
+</div>
+
+<script>
+  // Handle Student Registration Modal
+  document.addEventListener("DOMContentLoaded", function () {
+    const studentModal = document.getElementById("student-registration-modal");
+    const profileModal = document.getElementById("profile-edit-modal");
+
+    if (studentModal && studentModal.dataset.show === "true") {
+      studentModal.style.display = "flex";
+    }
+    
+    if (profileModal && profileModal.dataset.show === "true") {
+      profileModal.style.display = "flex";
+    }
+  });
+
+  function closeStudentModal() {
+    const modal = document.getElementById("student-registration-modal");
+    if (modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  function closeProfileModal() {
+    const modal = document.getElementById("profile-edit-modal");
+    if (modal) {
+      modal.style.display = "none";
+    }
+    
+    const scheduleForm = document.getElementById("scheduleForm");
+    if (scheduleForm) {
+      scheduleForm.reset();
+    }
+  }
+</script>

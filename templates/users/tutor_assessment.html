@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Assessment</title>
+    <link rel="stylesheet" href="{% static 'css/tutor_assessment.css' %}">
+</head>
+<body>
+
+    <!-- Include Navbar -->
+    {% include 'users/header2.html' %}
+
+    <div class="assessment-container">
+        <div class="assessment-card">
+            <h2>Tutor Assessment</h2>
+
+            <div id="warning-message" class="warning-message" style="display: none;">
+                Please select at least one answer before proceeding.
+            </div>
+            
+            <form id="assessment-form" method="POST">
+                {% csrf_token %}
+            
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            
+                <div class="question-wrapper">
+                    {% for question in questions %}
+                        <div class="question-block" data-question-id="{{ question.id }}">
+                            <p class="question-text">{{ question.question_text }}</p>
+                            <div class="answers">
+                                {% for answer in question.choices.all %}
+                                    <button type="button" class="answer-btn multi-select"
+                                            data-question-id="{{ question.id }}"
+                                            data-answer-id="{{ answer.id }}"
+                                            onclick="toggleAnswer(this)">
+                                        {{ answer.text }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="question_{{ question.id }}" id="selected-answers-{{ question.id }}">
+                        </div>
+                    {% endfor %}
+                </div>
+            
+                <div class="buttons">
+                    <button type="button" id="prev-btn" class="nav-btn" disabled>Back</button>
+                    <button type="button" id="next-btn" class="nav-btn">Next</button>
+                    <button type="submit" id="submit-btn" class="nav-btn" style="display: none;">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/tutor_assessment.js' %}"></script>
+</body>
+</html>

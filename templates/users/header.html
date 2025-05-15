@@ -1,0 +1,33 @@
+
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<header  style="background-color: #76aced;">
+    <div class="logo">
+        <a href="{% url 'index' %}">
+      <img src="{% static 'images/owl.png' %}" alt="Tutoria Logo">
+      <span style="font-weight: bold;">Tutoria</span>
+    </a>
+    </div>
+    <nav class="nav" style="display: none;">
+      <a href="{% url 'find_tutor' %}">Find a Tutor</a>
+      <a href= "">Become a Tutor</a>
+      <a href="">Subjects</a>
+      
+    </nav>
+
+
+    <div class="auth-buttons">
+      <button style="background-color: #d4d4d4;" onclick="signin()"  class="login">LOG IN</button>
+      <button style="background-color: 
+     f6f6f6;" onclick="signup()" class="signup">SIGN UP</button>
+    
+    </div>
+   
+   
+    
+</header>
+<script src="{% static 'js/header.js' %}"></script>
+
+

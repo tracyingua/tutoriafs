@@ -1,0 +1,96 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/edit_tutor_profile2.css' %}">
+
+<!-- Edit Tutor Profile Modal -->
+<div id="edit-tutor-profile-modal" class="new-modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('edit-tutor-profile-modal')">&times;</span>
+        <h3>Edit Tutor Profile</h3>
+
+        <form id="edit-tutor-profile-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Profile Picture -->
+            <div class="new-profile-pic-container">
+                <label for="tutor-profile-pic">Profile Picture:</label>
+                <div class="image-preview">
+                    <img id="profile-preview" src="{{ tutor.profile_photo.url }}" alt="Profile Picture"
+                         onerror="this.src='/static/default-profile.png';">
+                </div>
+                <label for="tutor-profile-pic" class="custom-file-upload">
+                    <i class="fa fa-upload"></i> Choose Photo
+                </label>
+                <input type="file" id="tutor-profile-pic" name="profile_picture" accept="image/*" hidden>
+            </div>
+
+            <!-- First Name -->
+            <div class="new-form-group">
+                <label for="tutor-first-name">First Name:</label>
+                <input type="text" id="tutor-first-name" name="first_name" value="{{ user.first_name }}" required>
+            </div>
+
+            <!-- Middle Name -->
+            <div class="new-form-group">
+                <label for="tutor-middle-name">Middle Name:</label>
+                <input type="text" id="tutor-middle-name" name="middle_name" value="{{ user.middle_name|default:'' }}">
+            </div>
+
+            <!-- Last Name -->
+            <div class="new-form-group">
+                <label for="tutor-last-name">Last Name:</label>
+                <input type="text" id="tutor-last-name" name="last_name" value="{{ user.last_name }}" required>
+            </div>
+
+                <!-- Email -->
+                <div class="new-form-group">
+                    <label for="tutor-email">Email:</label>
+                    <input type="email" id="tutor-email" name="email" value="{{ user.email }}" required>
+                </div>
+
+            <!-- Gender -->
+            <div class="new-form-group">
+                <label for="tutor-gender">Gender:</label>
+                <select id="tutor-gender" name="gender" required>
+                    <option value="" disabled>Select Gender</option>
+                    <option value="Male" {% if user.gender == "Male" %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user.gender == "Female" %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if user.gender == "Other" %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            
+            <!-- Home Address -->
+            <div class="new-form-group">
+                <label for="tutor-address">Street</label>
+                <input type="text" id="tutor-street" name="street" value="{{ user.street }}" required>
+            </div>
+
+            <div class="new-form-group">
+                <label for="tutor-address">Barangay</label>
+                <input type="text" id="tutor-barangayh" name="barangay value=" value= "{{ user.barangay }}" required>
+            </div>
+
+
+        
+
+            <button type="submit" class="save-button">Save</button>
+        </form>
+    </div>
+</div>
+
+
+<script src="{% static 'js/edit_tutor_profile2.js' %}"></script>
+
+
+<script>
+    var editProfileUrl2 = "{% url 'update_tutor_profile_2' %}";
+
+
+
+
+    
+</script>
+
+
+
+

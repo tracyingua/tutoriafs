@@ -1,0 +1,47 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/restrict.css' %}" />
+
+<!-- Blur Overlay (must be before modals in DOM) -->
+<div class="modal-blur-overlay" id="modalBlurOverlay"></div>
+
+<!-- Activate Confirmation Modal -->
+<div id="activateModal" class="modal">
+    <div class="modal-content">
+        <p id="activateText">Are you sure you want to activate this tutor account?</p>
+        <div class="modal-buttons">
+            <button id="confirmActivate" class="confirm-btn">Confirm</button>
+            <button id="cancelActivate" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Activation Success Modal -->
+<div id="activationSuccessModal" class="message-modal">
+    <div class="modal-content">
+        <p id="activationSuccessMessage">Tutor account activated successfully!</p>
+        <button id="closeActivationSuccess" class="confirm-btn">OK</button>
+    </div>
+</div>
+
+<style>
+       .modal-blur-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 998;
+    display: none;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+body.modal-open .main-content {
+    filter: blur(2px);
+    pointer-events: none;
+}
+</style>

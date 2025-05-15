@@ -1,0 +1,226 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  padding-top: 80px;
+}
+
+.profile-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+a{
+
+  text-decoration: none;
+}
+
+.edit-btn {
+
+  text-decoration: none;
+  background: #e4e4e4;
+  color: #333;
+  font-weight: 600;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+ 
+
+ 
+  border: 1px solid #aaa;
+
+}
+.profile-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  margin-top: 50px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #e9e9e9;
+  border: 2px solid #ddd;
+  position: relative;
+}
+
+.profile-wrapper::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #ddd;
+  transform: translateX(-1px);
+}
+
+.parent-profile {
+  width: 50%;
+  padding: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #e9e9e9;
+}
+
+.parent-photo {
+  object-fit: cover;
+  width: 160px;
+  height: 160px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+
+.student-section {
+  border-radius: 9px;
+  width: 50%;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  background: white;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;  
+  margin-top: 10px;
+}
+
+.button-group .btn {
+
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.button-group .btn:hover {
+  background-color: #f0f0f0;
+}
+
+
+.register-btn {
+  width: 90%;
+  padding: 12px;
+  font-size: 16px;
+  background: #3b8ae6 ;
+  color: black;
+  font-weight: bold;
+  border: 2px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 18px;
+}
+
+.schedule-btn {
+  width: 90%;
+  padding: 12px;
+  font-size: 16px;
+  background: #f0f0f0 ;
+  color: black;
+  font-weight: bold;
+  border: 2px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 18px;
+}
+
+.student-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.student-card {
+  display: flex;
+
+  align-items: center;
+  background: #5aa9ff;
+  padding: 12px;
+  border-radius: 8px;
+  color: black;
+
+  font-weight: bold;
+  justify-content: space-between;
+  width: 95%;
+}
+
+.student-card img {
+  object-fit: cover;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.student-info {
+  flex-grow: 1;
+  font-size: 14px;
+}
+
+.view-btn {
+  background: #e4e4e4;
+  color: black;
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .profile-wrapper {
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    width: 95%;
+  }
+
+  .profile-wrapper::before {
+    display: none;
+  }
+
+  .parent-profile,
+  .student-section {
+    width: 80%;
+    text-align: center;
+    background: white;
+  }
+
+  .student-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+    margin-left: -19px;
+  }
+
+  .student-info {
+    margin-bottom: 10px;
+  }
+}

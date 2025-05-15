@@ -1,0 +1,58 @@
+
+{% block content %}
+<div class="question-container">
+    <h2>Add Assessment Question</h2>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Question Input -->
+        <label for="id_question_text">Question:</label>
+        {{ question_form.question_text }}
+
+        <h3>Answer Choices</h3>
+        <div id="answer-choices">
+            {% for form in answer_forms %}
+                <div class="answer-choice">
+                    <label>Answer {{ forloop.counter }}:</label>
+                    {{ form.text }}
+                    <button type="button" class="remove-btn" onclick="removeChoice(this)">Remove</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="add-btn" onclick="addChoice()">Add Choice</button>
+
+        <button type="submit" class="save-btn">Save Question</button>
+    </form>
+</div>
+
+<!-- JavaScript for Adding Choices -->
+<script>
+    function addChoice() {
+        const container = document.getElementById('answer-choices');
+        const index = container.children.length + 1;
+
+        let choiceDiv = document.createElement('div');
+        choiceDiv.classList.add('answer-choice');
+        choiceDiv.innerHTML = `
+            <label>Answer ${index}:</label>
+            <input type="text" name="choices[]" class="choice-input">
+            <button type="button" class="remove-btn" onclick="removeChoice(this)">Remove</button>
+        `;
+        container.appendChild(choiceDiv);
+    }
+
+    function removeChoice(button) {
+        button.parentElement.remove();
+    }
+</script>
+{% endblock %}

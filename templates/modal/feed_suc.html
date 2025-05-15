@@ -1,0 +1,54 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/sch-suc.css' %}" />
+
+<!-- Success Modal -->
+<div id="success-modal" style="display: none;" class="mew-modal">
+    <div class="mew-modal-content">
+        {% for message in messages %}
+            {% if 'sch-success' in message.tags %}
+                <p>{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+        <button class="mew-close-modal" onclick="closeModal()">OK</button>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="error-modal" style="display: none;" class="mew-modal">
+    <div class="mew-modal-content">
+        {% for message in messages %}
+            {% if 'sch-error' in message.tags %}
+                <p>{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+        <button class="mew-close-modal" onclick="closeErrorModal()">OK</button>
+    </div>
+</div>
+
+<script src="{% static 'js/edit_parent_profile.js' %}"></script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const successModal = document.getElementById("success-modal");
+    const errorModal = document.getElementById("error-modal");
+
+    if (successModal.querySelector("p")) {
+        successModal.style.display = "flex";
+    }
+
+    if (errorModal.querySelector("p")) {
+        errorModal.style.display = "flex";
+    }
+});
+
+function closeModal() {
+    document.getElementById("success-modal").style.display = "none";
+}
+
+function closeErrorModal() {
+    document.getElementById("error-modal").style.display = "none";
+}
+
+</script>

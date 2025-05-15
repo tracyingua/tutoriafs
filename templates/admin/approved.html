@@ -1,0 +1,181 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approved Tutors - Admin Panel</title>
+    <link rel="icon" href="{% static 'images/owl.png' %}">
+    <link rel="stylesheet" href="{% static 'css/pending.css' %}">
+    <link rel="stylesheet" href="{% static 'css/approved.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+
+<body>
+    <div class="admin-container">
+        {% include 'admin/sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Approved Tutors</h1>
+                {% if approved_tutors.paginator.count > 0 %}
+                <div class="results-count">
+                    Showing {{ approved_tutors.start_index }}-{{ approved_tutors.end_index }} of {{ approved_tutors.paginator.count }} tutors
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="tutor-list">
+                {% for tutor in approved_tutors %}
+                <div class="tutor-item">
+                    <div class="tutor-details">
+                        {% if tutor.profile_photo %}
+                            <img src="{{ tutor.profile_photo.url }}" alt="Tutor">
+                        {% else %}
+                            <img src="{% static 'images/default-profile.png' %}" alt="Tutor">
+                        {% endif %}
+                        <div>
+                            <span class="fullname">{{ tutor.user.first_name|capfirst }} {{ tutor.user.last_name|capfirst }}</span>
+                            <div class="tutor-meta">
+                                <p><i class="fas fa-envelope"></i> {{ tutor.user.email }}</p>
+                                <p><i class="fas fa-user-check"></i> Status: {% if tutor.is_restricted %}Deactivated{% else %}Approved{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutor-details-section">
+                        <div class="detail-row">
+                            <span class="detail-label">Subjects:</span>
+                            <span class="detail-value">
+                                {% for subject in tutor.subjects.all %}
+                                    {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    None specified
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Grade Levels:</span>
+                            <span class="detail-value">
+                                {% for grade in tutor.grade_levels.all %}
+                                    {{ grade.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    None specified
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                         
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="tutor-actions">
+                        <div class="tutor-buttons">
+                            {% if tutor.is_restricted %}
+                                <button class="activate-btn" data-id="{{ tutor.id }}">
+                                    <i class="fas fa-check-circle"></i> ACTIVATE
+                                </button>
+                            {% else %}
+                                <button class="restrict-btn" data-id="{{ tutor.id }}">
+                                    <i class="fas fa-ban"></i> DEACTIVATE
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="info-containr">
+                        <button class="info-btn" id="info-btn">
+                            <i class="fas fa-file-alt"></i> VIEW CREDENTIALS
+                        </button>
+                        <div class="credentials-popup">
+                            <h4>TUTOR CREDENTIALS</h4>
+                            <ul>
+                                {% for credential in tutor.credentials.all %}
+                                    <li>
+                                        {{ credential.get_document_type_display }} - Uploaded on {{ credential.uploaded_at|date:"M d, Y" }}
+                                        <a href="{{ credential.document.url }}" target="_blank" title="View document">
+                                            <img src="{% static 'images/svg/paperclip.svg' %}" alt="View" class="paperclip-icon">
+                                        </a>
+                                    </li>
+                                {% empty %}
+                                    <li>No credentials uploaded</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                    <p class="no-pending">No approved tutors at the moment.</p>
+                {% endfor %}
+            </div>
+
+            {% if approved_tutors.paginator.num_pages > 1 %}
+            <div class="pagination">
+                <div class="pagination-controls">
+                    {% if approved_tutors.has_previous %}
+                        <a href="?page=1" class="page-link first-page" title="First Page">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ approved_tutors.previous_page_number }}" class="page-link prev-page" title="Previous Page">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% else %}
+                        <span class="page-link disabled first-page" title="First Page">
+                            <i class="fas fa-angle-double-left"></i>
+                        </span>
+                        <span class="page-link disabled prev-page" title="Previous Page">
+                            <i class="fas fa-angle-left"></i>
+                        </span>
+                    {% endif %}
+
+                    <div class="page-numbers">
+                        {% for num in approved_tutors.paginator.page_range %}
+                            {% if approved_tutors.number == num %}
+                                <span class="page-link current-page">{{ num }}</span>
+                            {% elif num > approved_tutors.number|add:'-3' and num < approved_tutors.number|add:'3' %}
+                                <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {% if approved_tutors.has_next %}
+                        <a href="?page={{ approved_tutors.next_page_number }}" class="page-link next-page" title="Next Page">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ approved_tutors.paginator.num_pages }}" class="page-link last-page" title="Last Page">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="page-link disabled next-page" title="Next Page">
+                            <i class="fas fa-angle-right"></i>
+                        </span>
+                        <span class="page-link disabled last-page" title="Last Page">
+                            <i class="fas fa-angle-double-right"></i>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'modal/restrict.html' %}
+
+
+    <script src="{% static 'js/approved.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const subjectSpans = document.querySelectorAll('.detail-value');
+
+    subjectSpans.forEach(span => {
+        span.innerHTML = span.innerHTML.replace(/\s*\([^)]*\)/g, '');
+    });
+});
+    </script>
+</body>
+</html>

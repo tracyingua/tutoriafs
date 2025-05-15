@@ -1,0 +1,12 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/sch-suc.css' %}" />
+
+<div id="successfully-modal" style="display: none;" class="mew-modal" data-show="{% if messages %}true{% endif %}">
+  <div class="mew-modal-content">
+    <p>Your profile has been successfully updated!</p>
+    <button class="mew-close-modal" onclick="closelyModal()">OK</button>
+  </div>
+</div>
+
+<script src="{% static 'js/edit_parent_profile.js' %}"></script>

@@ -1,0 +1,33 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/edit_parent_profile.css' %}" />
+
+
+<div id="profile-edit-modal" style="display: none;" class="modal" 
+     data-show="{% if messages %}{% for message in messages %}{% if 'edit_parent_profile_success' in message.tags %}true{% endif %}{% endfor %}{% endif %}">
+  <div class="modal-content">
+    {% for message in messages %}
+      {% if 'edit_parent_profile_success' in message.tags %}
+        <p>{{ message }}</p>
+      {% endif %}
+    {% endfor %}
+    <button class="close-modal" onclick="closeProfileModal()">OK</button>
+  </div>
+</div>
+
+<script>
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    const profileModal = document.getElementById("profile-edit-modal");
+
+    if (profileModal && profileModal.dataset.show === "true") {
+      profileModal.style.display = "flex";
+    }
+  });
+
+  function closeProfileModal() {
+    const modal = document.getElementById("profile-edit-modal");
+    if (modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>

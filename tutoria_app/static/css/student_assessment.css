@@ -1,0 +1,103 @@
+
+body {
+  
+    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+
+.assessment-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+}
+
+.assessment-card {
+    margin-top: 100px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 600px; 
+}
+
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: #494949;
+    transition: width 0.3s ease-in-out;
+}
+
+
+.answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.answer-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+   border-radius: 5px;
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.answer-btn:hover {
+    background-color: #6da9ff;
+}
+
+.answer-btn.selected {
+    background-color: #6da9ff; 
+    color: black;
+ 
+}
+
+
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.question-text{
+   font-size: 20px;
+    font-weight: bold;
+}
+.nav-btn {
+    padding: 10px 20px;
+    border: none;
+    font-weight: bold;
+    background: #e4e4e4;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background: #5a6268;
+}
+
+.nav-btn:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}

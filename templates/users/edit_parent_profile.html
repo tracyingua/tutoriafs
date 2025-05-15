@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/edit_parent_profile.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+
+  {% include 'users/navigation.html' %}
+
+
+ 
+  <main class="edit-profile-container">
+
+    
+    <div class="edit-profile-wrapper">
+      
+    <section class="back-button-wrapper">
+      <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+    </section>
+      <h2>Edit Profile</h2>
+
+   
+      
+      <form class="edit-profile-form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="profile-card">
+          <img id="profile-preview" src="{% if user.profile_photo %}{{ user.profile_photo.url }}{% else %}{% static 'images/svg/user1.svg' %}{% endif %}" 
+               alt="Profile Photo" class="profile-photo">
+          
+          <label for="id_profile_photo" class="custom-file-upload">
+            <i class="fa fa-upload"></i> Choose a Photo
+          </label>
+          <input type="file" name="profile_photo" id="id_profile_photo" accept="image/*" onchange="previewImage(event)">
+        </div>
+        
+        <label for="id_first_name">First Name</label>
+        {{ form.first_name }}
+      
+        <label for="id_middle_name">Middle Name</label>
+        {{ form.middle_name }}
+      
+        <label for="id_last_name">Last Name</label>
+        {{ form.last_name }}
+      
+        <label for="id_email">Email</label>
+        {{ form.email }}
+      
+        <label for="id_street">Street</label>
+        {{ form.street }}
+        <label for="id_barangay">Barangay</label>
+        {{ form.barangay }}
+      
+      
+        <button type="submit" class="save-btn">Save</button>
+      </form>
+      
+    </div>
+
+
+   
+    {% include 'modal/edit_parent_success.html' %}
+  </main>
+
+  <script src="{% static 'js/hamburger.js' %}"></script>
+  
+  <script src="{% static 'js/edit_parent_profile.js' %}"></script>
+  <script>
+
+var goBackUrl = "{% url 'parent_profile' %}";
+    
+  </script>
+  
+</body>
+</html>

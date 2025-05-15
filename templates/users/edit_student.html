@@ -1,0 +1,89 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register a Student</title>
+    <link rel="stylesheet" href="{% static 'css/edit_student.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+</head>
+
+{% include 'users/navigation.html' %}
+
+<body>
+
+    <div class="edit-container">
+        <div class="edit-card">
+
+            <section class="back-button-wrapper">
+                <button class="back-button" onclick="goBack()">
+                  <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </section>
+
+
+
+            <h2>Edit Student Info</h2>
+
+            <!-- Display Success Messages -->
+
+            <form method="post" enctype="multipart/form-data" class="edit-form">
+         
+
+                <div class="profile-card">
+                    <img src="{{ student.profile_photo.url }}" alt="Profile Image" class="profile-photo" id="profile-preview">
+                    <label for="id_profile_photo" class="custom-file-upload">
+                        <i class="fa fa-upload"></i> Choose a Photo
+                    </label>
+                    <p style="display: none;"> {{ form.profile_photo }} </p>
+                </div>
+
+                
+           
+
+        
+                {% csrf_token %}
+                
+                <label for="id_first_name">First Name</label>
+                {{ form.first_name }}
+
+
+                <label for="id_last_name">Middle Name</label>
+                {{ form.middle_name }}
+    
+    
+                <label for="id_last_name">Last Name</label>
+                {{ form.last_name }}
+    
+                <label for="id_gender">Gender</label>
+                {{ form.gender }}
+    
+                <label for="id_birthday">Birthday</label>
+                {{ form.birthday }}
+    
+                <label for="id_grade_level">Grade Level</label>
+                {{ form.grade_level }}
+    
+                <label for="id_street">Street</label>
+                {{ form.street }}
+                <label for="id_barangay">Barangay</label>
+                {{ form.barangay }}
+
+                <button type="submit" class="save-btn">Update</button>
+            </form>
+        </div>
+
+        {% include 'modal/edit_student_profile_succ.html' %}
+    </div>
+
+    
+
+    <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/edit_student.js' %}"></script>
+    <script>
+        var goBackUrl = "{% url 'student_profile' student.id %}";
+    </script>
+</body>
+</html>

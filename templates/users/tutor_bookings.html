@@ -1,0 +1,394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Bookings - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/tutor_bookings.css' %}">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+  {% include 'users/navigation.html' %}
+
+  <div class="tutor-bookings-container">
+    <div class="bookings-header">
+      
+    </div>
+
+    <div class="bookings-controls">
+      <div class="search-filter-container">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search students...">
+        </div>
+        <div class="filter-group">
+          <label for="statusFilter"><i class="fas fa-filter"></i> Filter by:</label>
+          <select id="statusFilter" class="filter-select">
+            <option value="all">All Statuses</option>
+            <option value="pending" selected>Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="declined">Declined</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="bookings-summary">
+      <div class="summary-card">
+        <div class="summary-icon pending">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="summary-content">
+          <span class="summary-count">{{ pending_count }}</span>
+          <span class="summary-label">Pending</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon confirmed">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="summary-content">
+          <span class="summary-count">{{ confirmed_count }}</span>
+          <span class="summary-label">Confirmed</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon completed">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="summary-content">
+          <span class="summary-count">{{ completed_count }}</span>
+          <span class="summary-label">Completed</span>
+        </div>
+      </div>
+    </div>
+
+    {% if bookings %}
+      <div class="bookings-list">
+        {% regroup bookings by tutor_schedule.student as student_groups %}
+        {% for group in student_groups %}
+          {% with student=group.grouper %}
+            {% with latest_session=group.list.0 %}
+              <div class="booking-card" data-status="{{ latest_session.tutor_schedule.status|lower }}" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}">
+                <div class="booking-header">
+                  <div class="student-avatar">
+                    {% if student.profile_photo %}
+                      <img src="{{ student.profile_photo.url }}" alt="{{ student.first_name }}'s photo">
+                    {% else %}
+                      <img src="{% static 'images/default-profile.png' %}" alt="Default profile">
+                    {% endif %}
+                  </div>
+                  <div class="student-info">
+                    <h3>{{ student.first_name }} {{ student.last_name }}</h3>
+                    <div class="student-meta">
+                      <span><i class="fas fa-graduation-cap"></i> Grade {{ student.grade_level }}</span>
+                      <span><i class="fas fa-{{ student.gender|lower }}"></i> {{ student.gender }}</span>
+                    </div>
+                  </div>
+                  <div class="booking-status">
+                    <span class="status-badge status-{{ latest_session.tutor_schedule.status|lower }}">
+                      {{ latest_session.tutor_schedule.status|title }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="booking-details">
+                  <div class="detail-group">
+                    <h4>Schedule</h4>
+                    <p>
+                      <i class="fas fa-calendar-day"></i> 
+                      {{ latest_session.tutor_schedule.start_date|date:"M d, Y" }} - {{ latest_session.tutor_schedule.end_date|date:"M d, Y" }}
+                    </p>
+                    {% if latest_session.start_time %}
+                      <p>
+                        <i class="fas fa-clock"></i> 
+                        {{ latest_session.start_time|time:"g:i A" }} - {{ latest_session.end_time|time:"g:i A" }}
+                      </p>
+                    {% endif %}
+                  </div>
+
+                  <div class="detail-group">
+                    <h4>Session Details</h4>
+                    <p><i class="fas fa-stopwatch"></i> {{ latest_session.duration }} hour session</p>
+                    <p><i class="fas fa-book"></i> Subject: {{ latest_session.subject.name }}</p>
+                  </div>
+                </div>
+
+                <div class="booking-actions">
+                  <a href="{% url 'tutor_booking_details' student.id %}" style="text-decoration: none;" class="btn-details">
+                    <i  class="fas fa-eye"></i> View Details
+                  </a>
+                  
+                  {% if latest_session.tutor_schedule.status|lower == "pending" %}
+                    <button class="btn-accept" data-student-id="{{ student.id }}" data-student-name="{{ student.first_name }} {{ student.last_name }}">
+                      <i class="fas fa-check"></i> Accept
+                    </button>
+                    <button class="btn-decline" data-student-id="{{ student.id }}" data-student-name="{{ student.first_name }} {{ student.last_name }}">
+                      <i class="fas fa-times"></i> Decline
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+            {% endwith %}
+          {% endwith %}
+        {% endfor %}
+
+        <!-- No bookings message (moved outside the loop) -->
+        <div id="noBookingsMessage" class="empty-state" style="display: none;">
+          <div class="empty-icon">
+            <i class="fas fa-calendar-times"></i>
+          </div>
+          <h3>No Bookings Found</h3>
+          <p>No bookings match your filter or search criteria. Please adjust your filters or try again later!</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <div class="pagination">
+          {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-link first-page"><i class="fas fa-angle-double-left"></i></a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-link prev-page"><i class="fas fa-angle-left"></i></a>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <span class="page-link current-page">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link next-page"><i class="fas fa-angle-right"></i></a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link last-page"><i class="fas fa-angle-double-right"></i></a>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-calendar-times"></i>
+        </div>
+        <h3>No Bookings Yet</h3>
+        <p>You don't have any tutoring bookings at the moment. Check back later!</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirmationModalTitle">Confirm Action</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p id="confirmationModalMessage">Are you sure you want to perform this action?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-confirm" id="confirmActionBtn">Confirm</button>
+        <button class="btn btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Modal -->
+  <div id="messageModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="messageModalTitle">Message</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p id="messageModalContent">Operation completed successfully.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-confirm" id="messageModalClose">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Global variables to store action details
+    let currentAction = null;
+    let currentStudentId = null;
+    let currentStudentName = null;
+
+    function updateVisibleBookings() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const selectedStatus = document.getElementById("statusFilter").value.toLowerCase();
+      const bookingCards = document.querySelectorAll(".booking-card");
+      let visibleCount = 0;
+
+      bookingCards.forEach(card => {
+        const studentName = card.getAttribute("data-student-name");
+        const status = card.getAttribute("data-status").toLowerCase();
+        
+        const matchesSearch = studentName.includes(searchTerm);
+        const matchesFilter = (selectedStatus === "all" || status === selectedStatus);
+        
+        card.style.display = (matchesSearch && matchesFilter) ? "block" : "none";
+        if (card.style.display !== "none") visibleCount++;
+      });
+
+      const noBookingsEl = document.getElementById("noBookingsMessage");
+      noBookingsEl.style.display = (visibleCount === 0 && bookingCards.length > 0) ? "block" : "none";
+    }
+
+    function getCSRFToken() {
+      let cookieValue = null;
+      const name = 'csrftoken';
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    function updateBookingStatus(studentId, action) {
+      const csrfToken = getCSRFToken();
+      
+      if (!csrfToken) {
+        showMessage("Error", "Security token missing. Please refresh the page and try again.");
+        return;
+      }
+
+      $.ajax({
+        url: "{% url 'update_booking_status' %}",
+        type: "POST",
+        data: {
+          student_id: studentId,
+          action: action,
+          csrfmiddlewaretoken: csrfToken
+        },
+        beforeSend: function() {
+          // Show loading indicator if needed
+        },
+        success: function(response) {
+          if (response.success) {
+            let message = "";
+            if (action === "accept") {
+              message = `You have successfully accepted ${currentStudentName}'s booking request.`;
+            } else {
+              message = `You have declined ${currentStudentName}'s booking request.`;
+            }
+            showMessage("Success", message, true);
+          } else {
+            showMessage("Error", response.message || "An error occurred while processing your request.");
+          }
+        },
+        error: function(xhr, status, error) {
+          showMessage("Error", "An error occurred: " + error);
+        }
+      });
+    }
+
+    function showConfirmation(action, studentId, studentName) {
+      currentAction = action;
+      currentStudentId = studentId;
+      currentStudentName = studentName;
+
+      const modal = document.getElementById("confirmationModal");
+      const title = document.getElementById("confirmationModalTitle");
+      const message = document.getElementById("confirmationModalMessage");
+      const confirmBtn = document.getElementById("confirmActionBtn");
+
+      if (action === "accept") {
+        title.textContent = "Confirm Acceptance";
+        message.textContent = `Are you sure you want to accept ${studentName}'s booking request?`;
+        confirmBtn.className = "btn btn-confirm";
+        confirmBtn.textContent = "Accept";
+      } else {
+        title.textContent = "Confirm Decline";
+        message.textContent = `Are you sure you want to decline ${studentName}'s booking request?`;
+        confirmBtn.className = "btn btn-decline";
+        confirmBtn.textContent = "Decline";
+      }
+
+      modal.style.display = "block";
+    }
+
+    function showMessage(title, message, reload = false) {
+      const modal = document.getElementById("messageModal");
+      document.getElementById("messageModalTitle").textContent = title;
+      document.getElementById("messageModalContent").textContent = message;
+      modal.style.display = "block";
+
+      const closeBtn = document.getElementById("messageModalClose");
+      closeBtn.onclick = function() {
+        modal.style.display = "none";
+        if (reload) {
+          location.reload();
+        }
+      };
+    }
+
+    // Close modals when clicking outside or on close button
+    window.onclick = function(event) {
+      const confirmationModal = document.getElementById("confirmationModal");
+      const messageModal = document.getElementById("messageModal");
+
+      if (event.target === confirmationModal || event.target.classList.contains('close')) {
+        confirmationModal.style.display = "none";
+      }
+      if (event.target === messageModal || event.target.classList.contains('close')) {
+        messageModal.style.display = "none";
+      }
+    };
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+    
+      document.getElementById("searchInput").addEventListener('keyup', updateVisibleBookings);
+      document.getElementById("statusFilter").addEventListener('change', updateVisibleBookings);
+      
+ 
+      updateVisibleBookings();
+
+    
+      document.querySelectorAll('.btn-accept').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const studentId = this.getAttribute('data-student-id');
+          const studentName = this.getAttribute('data-student-name');
+          showConfirmation("accept", studentId, studentName);
+        });
+      });
+
+
+      document.querySelectorAll('.btn-decline').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const studentId = this.getAttribute('data-student-id');
+          const studentName = this.getAttribute('data-student-name');
+          showConfirmation("decline", studentId, studentName);
+        });
+      });
+
+    
+      document.getElementById('confirmActionBtn').addEventListener('click', function() {
+        document.getElementById('confirmationModal').style.display = "none";
+        updateBookingStatus(currentStudentId, currentAction);
+      });
+
+      document.querySelector('.btn-cancel').addEventListener('click', function() {
+        document.getElementById('confirmationModal').style.display = "none";
+      });
+
+    
+      document.getElementById('messageModalClose').addEventListener('click', function() {
+        document.getElementById('messageModal').style.display = "none";
+      });
+    });
+  </script>
+</body>
+</html>

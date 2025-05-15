@@ -1,0 +1,99 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Sidebar</title>
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" href="{% static 'images/owl.png' %}">
+</head>
+<body>
+
+<!-- Toggle Button (Always visible on mobile) -->
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="logo-container">
+        <img src="{% static 'images/owl.png' %}" alt="Tutoria Logo" class="logo">
+    </div>
+    <h2>Tutoria</h2>
+    <ul>
+        <li>
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" onclick="closeSidebarOnMobile()">
+                <span class="material-icons menu-icon">dashboard</span>Dashboard
+            </a>
+        </li>
+       
+        <li>
+            <a href="{% url 'reviews' %}" class="{% if request.resolver_match.url_name == 'reviews' or request.resolver_match.url_name == 'tutor_reviews_detail' %}active{% endif %}">
+
+                <span class="material-icons menu-icon">reviews</span> Tutors
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'student_list' %}" class="{% if request.resolver_match.url_name == 'student_list' or request.resolver_match.url_name == 'parent_profile' %}active{% endif %}">
+
+                <span class="material-icons menu-icon">school</span> Students
+            </a>
+        </li>
+
+
+        <li>
+            <a href="{% url 'curriculum_management' %}" class="{% if request.resolver_match.url_name == 'curriculum_management' %}active{% endif %}" onclick="closeSidebarOnMobile()">
+                <span class="material-icons menu-icon">subjects</span>Subjects
+            </a>
+        </li>
+       
+        
+        <li>
+            <a href="{% url 'pending' %}" class="{% if request.resolver_match.url_name == 'pending' %}active{% endif %}" onclick="closeSidebarOnMobile()">
+                <img src="{% static 'images/svg/stack.svg' %}" class="menu-icon"> Pending Tutors
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'approved' %}" class="{% if request.resolver_match.url_name == 'approved' %}active{% endif %}" onclick="closeSidebarOnMobile()">
+                <img src="{% static 'images/svg/check.svg' %}" class="menu-icon"> Approved Tutors
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'declined' %}" class="{% if request.resolver_match.url_name == 'declined' %}active{% endif %}" onclick="closeSidebarOnMobile()">
+                <img src="{% static 'images/svg/x.svg' %}" class="menu-icon"> Declined Tutors
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'restricted' %}" class="{% if request.resolver_match.url_name == 'restricted' %}active{% endif %}" onclick="closeSidebarOnMobile()">
+                <img src="{% static 'images/svg/ban.svg' %}" class="menu-icon"> Deactivated Tutors
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin_logout' %}" class="logout-btn" onclick="closeSidebarOnMobile()">
+                <img src="{% static 'images/svg/logout.svg' %}" class="menu-icon"> Logout
+            </a>
+        </li>
+    </ul>
+</div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    }
+
+    function closeSidebarOnMobile() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+    }
+</script>
+
+</body>
+</html>

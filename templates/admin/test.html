@@ -1,0 +1,681 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum Management | Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/add_data.css' %}">
+    <link rel="icon" href="{% static 'images/owl.png' %}">
+</head>
+<body>
+    {% include 'admin/sidebar.html' %}
+
+    <div class="dashboard-container">
+        <div class="curriculum-management">
+            <div class="header">
+                <h1><i class="fas fa-book-open"></i> Curriculum Management</h1>
+                <a href="{% url 'dashboard' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="management-tabs">
+                <div class="tab active" data-tab="subjects">
+                    <i class="fas fa-book"></i> Subjects
+                </div>
+                <div class="tab" data-tab="topics">
+                    <i class="fas fa-book-open"></i> Topics
+                </div>
+                <div class="tab" data-tab="subtopics">
+                    <i class="fas fa-list-ul"></i> SubTopics
+                </div>
+            </div>
+
+            <!-- Subjects Tab -->
+            <div class="tab-content active" id="subjects-tab">
+                <div class="form-container">
+                    <h3 class="form-header"><i class="fas fa-plus-circle"></i> Add New Subject</h3>
+                    <form method="POST" id="subject-form">
+                        {% csrf_token %}
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="subject-name">Subject Name</label>
+                                <input type="text" id="subject-name" name="subject_name" class="form-control" placeholder="Mathematics, Science, etc." required>
+                            </div>
+                        </div>
+                        <input type="hidden" name="form_type" value="subject">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i> Save Subject
+                        </button>
+                    </form>
+                </div>
+
+                <div class="items-list">
+                    <div class="list-header">
+                        <span>Subject Name</span>
+                        <span>Topics Count</span>
+                        <span>Actions</span>
+                    </div>
+                    
+                    {% if subjects %}
+                        {% for subject in subjects %}
+                        <div class="list-item" data-id="{{ subject.id }}">
+                            <div class="item-name">
+                                <strong class="subject-name">{{ subject.name }}</strong>
+                            </div>
+                            <div class="item-count">{{ subject.topics.count }} topics</div>
+                            <div class="item-actions">
+                                <button class="action-btn edit-subject" title="Edit" data-id="{{ subject.id }}" data-name="{{ subject.name }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-subject" title="Delete" data-id="{{ subject.id }}" data-name="{{ subject.name }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <p>No subjects have been added yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Topics Tab -->
+            <div class="tab-content" id="topics-tab">
+                <div class="form-container">
+                    <h3 class="form-header"><i class="fas fa-plus-circle"></i> Add New Topic</h3>
+                    <form method="POST" id="topic-form">
+                        {% csrf_token %}
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="topic-subject">Subject</label>
+                                <select id="topic-subject" name="subject_id" class="form-control" required>
+                                    <option value="" disabled selected>Select a subject</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="topic-name">Topic Name</label>
+                                <input type="text" id="topic-name" name="topic_name" class="form-control" placeholder="Algebra, Geometry, etc." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="topic-description">Description</label>
+                                <textarea id="topic-description" name="topic_description" class="form-control" placeholder="Detailed description of the topic"></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" name="form_type" value="topic">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i> Save Topic
+                        </button>
+                    </form>
+                </div>
+
+                <div class="items-list">
+                    <div class="list-header">
+                        <span>Topic Name</span>
+                        <span>Subject</span>
+                        <span>Actions</span>
+                    </div>
+                    
+                    {% if topics %}
+                        {% for topic in topics %}
+                        <div class="list-item" data-id="{{ topic.id }}">
+                            <div class="item-name">
+                                <strong class="topic-name">{{ topic.name }}</strong>
+                                {% if topic.description %}
+                                <p class="topic-description">{{ topic.description|truncatechars:60 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="topic-subject">{{ topic.subject.name }}</div>
+                            <div class="item-actions">
+                                <button class="action-btn edit-topic" title="Edit" data-id="{{ topic.id }}" data-name="{{ topic.name }}" data-description="{{ topic.description }}" data-subject="{{ topic.subject.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-topic" title="Delete" data-id="{{ topic.id }}" data-name="{{ topic.name }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <p>No topics have been added yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SubTopics Tab -->
+            <div class="tab-content" id="subtopics-tab">
+                <div class="form-container">
+                    <h3 class="form-header"><i class="fas fa-plus-circle"></i> Add New SubTopic</h3>
+                    <form method="POST" id="subtopic-form">
+                        {% csrf_token %}
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="subtopic-topic">Topic</label>
+                                <select id="subtopic-topic" name="topic_id" class="form-control" required>
+                                    <option value="" disabled selected>Select a topic</option>
+                                    {% for topic in topics %}
+                                    <option value="{{ topic.id }}">{{ topic.name }} ({{ topic.subject.name }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="subtopic-name">SubTopic Name</label>
+                                <input type="text" id="subtopic-name" name="subtopic_name" class="form-control" placeholder="Linear Equations, Quadratic Equations, etc." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="subtopic-description">Description</label>
+                                <textarea id="subtopic-description" name="subtopic_description" class="form-control" placeholder="Detailed description of the subtopic"></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" name="form_type" value="subtopic">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i> Save SubTopic
+                        </button>
+                    </form>
+                </div>
+
+                <div class="items-list">
+                    <div class="list-header">
+                        <span>SubTopic Name</span>
+                        <span>Topic</span>
+                        <span>Actions</span>
+                    </div>
+                    
+                    {% if subtopics %}
+                        {% for subtopic in subtopics %}
+                        <div class="list-item" data-id="{{ subtopic.id }}">
+                            <div class="item-name">
+                                <strong class="subtopic-name">{{ subtopic.name }}</strong>
+                                {% if subtopic.description %}
+                                <p class="subtopic-description">{{ subtopic.description|truncatechars:60 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="subtopic-topic">{{ subtopic.topic.name }}</div>
+                            <div class="item-actions">
+                                <button class="action-btn edit-subtopic" title="Edit" data-id="{{ subtopic.id }}" data-name="{{ subtopic.name }}" data-description="{{ subtopic.description }}" data-topic="{{ subtopic.topic.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-subtopic" title="Delete" data-id="{{ subtopic.id }}" data-name="{{ subtopic.name }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-list-ul"></i>
+                            <p>No subtopics have been added yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Deletion</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<span id="item-to-delete"></span>"?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit <span id="edit-item-type"></span></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    {% csrf_token %}
+                    <div id="subject-edit-fields" class="edit-fields">
+                        <div class="form-group">
+                            <label for="edit-subject-name">Subject Name</label>
+                            <input type="text" id="edit-subject-name" name="name" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div id="topic-edit-fields" class="edit-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="edit-topic-subject">Subject</label>
+                            <select id="edit-topic-subject" name="subject" class="form-control" required>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-topic-name">Topic Name</label>
+                            <input type="text" id="edit-topic-name" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-topic-description">Description</label>
+                            <textarea id="edit-topic-description" name="description" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="subtopic-edit-fields" class="edit-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="edit-subtopic-topic">Topic</label>
+                            <select id="edit-subtopic-topic" name="topic" class="form-control" required>
+                                {% for topic in topics %}
+                                <option value="{{ topic.id }}">{{ topic.name }} ({{ topic.subject.name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-subtopic-name">SubTopic Name</label>
+                            <input type="text" id="edit-subtopic-name" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-subtopic-description">Description</label>
+                            <textarea id="edit-subtopic-description" name="description" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="edit-item-id" name="item_id">
+                    <input type="hidden" id="edit-item-type-input" name="item_type">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancel</button>
+                <button class="btn btn-primary" id="confirm-edit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div class="modal" id="messageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="message-modal-title">Message</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="message-modal-content"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="message-modal-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track current active tab
+        let currentActiveTab = localStorage.getItem('lastActiveTab') || 'subjects';
+        
+        // Initialize tabs based on stored active tab
+        function initializeTabs() {
+            const tab = document.querySelector(`.tab[data-tab="${currentActiveTab}"]`);
+            if (tab) {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to stored tab
+                tab.classList.add('active');
+                document.getElementById(`${currentActiveTab}-tab`).classList.add('active');
+            }
+        }
+        
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                currentActiveTab = tab.getAttribute('data-tab');
+                localStorage.setItem('lastActiveTab', currentActiveTab);
+                document.getElementById(`${currentActiveTab}-tab`).classList.add('active');
+                
+                // Update URL hash
+                window.location.hash = currentActiveTab;
+            });
+        });
+    
+        // Modal functionality
+        const modals = document.querySelectorAll('.modal');
+        const modalCloseButtons = document.querySelectorAll('.modal-close');
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        modalCloseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                closeModal(modal.id);
+            });
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeModal(e.target.id);
+            }
+        });
+
+        // Show message in modal
+        function showMessage(title, message, isError = false, reloadAfter = false) {
+            const titleEl = document.getElementById('message-modal-title');
+            const contentEl = document.getElementById('message-modal-content');
+            
+            titleEl.textContent = title;
+            contentEl.textContent = message;
+            
+            if (isError) {
+                titleEl.style.color = '#dc3545';
+                contentEl.style.color = '#dc3545';
+            } else {
+                titleEl.style.color = '';
+                contentEl.style.color = '';
+            }
+            
+            openModal('messageModal');
+            
+            // Handle OK button
+            const okBtn = document.getElementById('message-modal-ok');
+            const handler = function() {
+                closeModal('messageModal');
+                if (reloadAfter) {
+                    window.location.href = window.location.pathname + `#${currentActiveTab}`;
+                    window.location.reload();
+                }
+                okBtn.removeEventListener('click', handler);
+            };
+            okBtn.addEventListener('click', handler);
+        }
+        
+        // Delete functionality
+        let currentItemToDelete = null;
+        let deleteUrl = '';
+        
+        document.querySelectorAll('.delete-subject, .delete-topic, .delete-subtopic').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const itemName = this.getAttribute('data-name');
+                const itemType = this.classList.contains('delete-subject') ? 'subject' : 
+                                 this.classList.contains('delete-topic') ? 'topic' : 'subtopic';
+                
+                currentItemToDelete = itemId;
+                deleteUrl = `/delete-${itemType}/${itemId}/`;
+                document.getElementById('item-to-delete').textContent = itemName;
+                openModal('deleteModal');
+            });
+        });
+        
+        document.getElementById('confirm-delete').addEventListener('click', function() {
+            if (currentItemToDelete) {
+                const deleteBtn = this;
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                
+                fetch(deleteUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        closeModal('deleteModal');
+                        showMessage('Success', data.message, false, true);
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Error', error.message, true);
+                })
+                .finally(() => {
+                    deleteBtn.disabled = false;
+                    deleteBtn.innerHTML = 'Delete';
+                });
+            }
+        });
+    
+        // Edit functionality
+        document.querySelectorAll('.edit-subject, .edit-topic, .edit-subtopic').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const itemName = this.getAttribute('data-name');
+                const itemDescription = this.getAttribute('data-description') || '';
+                
+                let itemType = '';
+                let itemTypeDisplay = '';
+                
+                if (this.classList.contains('edit-subject')) {
+                    itemType = 'subject';
+                    itemTypeDisplay = 'Subject';
+                    
+                    // Show subject fields and hide others
+                    document.getElementById('subject-edit-fields').style.display = 'block';
+                    document.getElementById('topic-edit-fields').style.display = 'none';
+                    document.getElementById('subtopic-edit-fields').style.display = 'none';
+                    
+                    // Populate fields
+                    document.getElementById('edit-subject-name').value = itemName;
+                } 
+                else if (this.classList.contains('edit-topic')) {
+                    itemType = 'topic';
+                    itemTypeDisplay = 'Topic';
+                    const subjectId = this.getAttribute('data-subject');
+                    
+                    // Show topic fields and hide others
+                    document.getElementById('subject-edit-fields').style.display = 'none';
+                    document.getElementById('topic-edit-fields').style.display = 'block';
+                    document.getElementById('subtopic-edit-fields').style.display = 'none';
+                    
+                    // Populate fields
+                    document.getElementById('edit-topic-name').value = itemName;
+                    document.getElementById('edit-topic-description').value = itemDescription;
+                    document.getElementById('edit-topic-subject').value = subjectId;
+                } 
+                else if (this.classList.contains('edit-subtopic')) {
+                    itemType = 'subtopic';
+                    itemTypeDisplay = 'SubTopic';
+                    const topicId = this.getAttribute('data-topic');
+                    
+                    // Show subtopic fields and hide others
+                    document.getElementById('subject-edit-fields').style.display = 'none';
+                    document.getElementById('topic-edit-fields').style.display = 'none';
+                    document.getElementById('subtopic-edit-fields').style.display = 'block';
+                    
+                    // Populate fields
+                    document.getElementById('edit-subtopic-name').value = itemName;
+                    document.getElementById('edit-subtopic-description').value = itemDescription;
+                    document.getElementById('edit-subtopic-topic').value = topicId;
+                }
+                
+                // Set common fields
+                document.getElementById('edit-item-id').value = itemId;
+                document.getElementById('edit-item-type-input').value = itemType;
+                document.getElementById('edit-item-type').textContent = itemTypeDisplay;
+                
+                openModal('editModal');
+            });
+        });
+        
+        // Handle edit form submission
+        document.getElementById('confirm-edit').addEventListener('click', function() {
+    const form = document.getElementById('edit-form');
+    const formData = new FormData(form);
+    const itemId = document.getElementById('edit-item-id').value;
+    const itemType = document.getElementById('edit-item-type-input').value;
+    
+    // Manually construct the form data to ensure all required fields are included
+    const data = {
+        item_id: itemId,
+        item_type: itemType,
+        csrfmiddlewaretoken: document.querySelector('[name=csrfmiddlewaretoken]').value
+    };
+
+    // Add fields based on item type
+    if (itemType === 'subject') {
+        data.name = document.getElementById('edit-subject-name').value;
+    } 
+    else if (itemType === 'topic') {
+        data.name = document.getElementById('edit-topic-name').value;
+        data.description = document.getElementById('edit-topic-description').value;
+        data.subject = document.getElementById('edit-topic-subject').value;
+    } 
+    else if (itemType === 'subtopic') {
+        data.name = document.getElementById('edit-subtopic-name').value;
+        data.description = document.getElementById('edit-subtopic-description').value;
+        data.topic = document.getElementById('edit-subtopic-topic').value;
+    }
+
+    const submitBtn = this;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    fetch(`/edit-${itemType}/${itemId}/`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': data.csrfmiddlewaretoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(async response => {
+        const responseData = await response.json();
+        if (!response.ok) {
+            if (responseData.errors) {
+                let errorMessages = [];
+                for (const field in responseData.errors) {
+                    errorMessages.push(`${field}: ${responseData.errors[field]}`);
+                }
+                throw new Error(errorMessages.join('\n'));
+            }
+            throw new Error(responseData.message || `Server returned ${response.status} status`);
+        }
+        return responseData;
+    })
+    .then(data => {
+        if (data.success) {
+            closeModal('editModal');
+            showMessage('Success', data.message, false, true);
+        } else {
+            throw new Error(data.message || 'Unknown error occurred');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error', error.message, true);
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Save Changes';
+    });
+});
+        // Form submission handling for add forms
+        document.querySelectorAll('#subject-form, #topic-form, #subtopic-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // Store current tab before submission
+                const currentTab = currentActiveTab;
+                
+                // Add X-Requested-With header to identify AJAX requests
+                const headers = new Headers();
+                headers.append('X-Requested-With', 'XMLHttpRequest');
+                headers.append('X-CSRFToken', '{{ csrf_token }}');
+                
+                fetch(this.action || '{% url "curriculum_management" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: headers
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showMessage('Success', data.message, false, true);
+                        this.reset();
+                        localStorage.setItem('lastActiveTab', currentTab);
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Error', error.message, true);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+                });
+            });
+        });
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // First check URL hash
+            const hash = window.location.hash.substring(1);
+            if (hash && ['subjects', 'topics', 'subtopics'].includes(hash)) {
+                currentActiveTab = hash;
+                localStorage.setItem('lastActiveTab', currentActiveTab);
+            }
+            
+            // Then initialize tabs
+            initializeTabs();
+        });
+    </script>
+</body>
+</html>

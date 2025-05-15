@@ -1,0 +1,94 @@
+/* Base Tutor Item Styles */
+.tutor-item {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    height: 100%; /* Ensure all cards have same height */
+}
+
+/* Button Container Fix */
+.tutor-actions {
+    margin-top: auto; /* Pushes buttons to bottom */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 1.5rem;
+}
+
+/* Consistent Button Styling */
+.tutor-buttons, .info-containr {
+    width: 100%;
+}
+
+/* Enhanced Buttons */
+.restrict-btn, .activate-btn, .info-btn {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* DEACTIVATE Button */
+.restrict-btn {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    color: black;
+}
+
+.restrict-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+
+.activate-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.activate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+
+.info-btn {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    color: black;
+}
+
+.info-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.restrict-btn:active, .activate-btn:active, .info-btn:active {
+    transform: translateY(0);
+}
+
+
+@media (max-width: 768px) {
+    .tutor-actions {
+        flex-direction: column;
+    }
+    
+    .restrict-btn, .activate-btn, .info-btn {
+        width: 100%;
+    }
+}

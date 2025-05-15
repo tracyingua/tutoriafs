@@ -1,0 +1,230 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutor Profile</title>
+    <link rel="stylesheet" href="{% static 'css/tutor_profile.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+            .name {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .label {
+        font-weight: bold;
+        width: 130px; 
+        flex-shrink: 0;
+    }
+
+    .value {
+        flex: 1;
+        word-break: break-word;
+    }
+
+    </style>
+
+  </head>
+<body>
+    {% include 'users/navigation.html' %}
+    <div class="profile-container">
+        <h2 class="profile-title">PROFILE</h2>
+        <div class="profile-content">
+            <div class="profile-left">
+                <button  class="edit-information" onclick="openModal('edit-profile-modal')">Edit Information</button>
+                <div class="profile-card">
+                    <h3 id="teaches-line">
+                        TEACHES:
+                        {% for subject in tutor.subjects.all %}
+                          <span class="subject-name">{{ subject.name }}{% if not forloop.last %}, {% endif %}</span>
+                        {% empty %}
+                          No subjects added yet.
+                        {% endfor %}
+                      </h3>
+                      
+                    <p>Overall Rating: <span class="rating">
+                        {% if average_rating == 5 %}★★★★★{% elif average_rating >= 4 %}★★★★☆{% elif average_rating >= 3 %}★★★☆☆{% elif average_rating >= 2 %}★★☆☆☆{% else %}★☆☆☆☆{% endif %}
+                        {{ average_rating }}</span>
+                    </p>
+                    <ul>
+                        <li>Tutoring Type: {{ tutor.get_tutoring_type_display }}</li>
+                        <li>Phone Number: {{ tutor.user.phone_number }}</li>
+                        <li>
+                            Grade Levels:
+                            {% for grade_level in grade_levels %}
+                                {{ grade_level.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+
+                        </li>
+                    </ul>
+
+
+                
+                </div>
+
+                <div class="credentials-container">
+                    <h4>Credentials</h4>
+                    <ul class="credentials-list">
+                        {% for credential in credentials %}
+                            <li class="credential-item {% if forloop.counter > 3 %}hidden{% endif %}">
+                                <span class="file-icon">
+                                    {% if credential.document.url|lower|slice:"-4:" == ".pdf" %}
+                                        <i class="fas fa-file-pdf" style="color: red;"></i>
+                                    {% elif credential.document.url|lower|slice:"-5:" == ".docx" or credential.document.url|lower|slice:"-4:" == ".doc" %}
+                                        <i class="fas fa-file-word" style="color: #2B579A;"></i>
+                                    {% elif credential.document.url|lower|slice:"-4:" == ".jpg" or credential.document.url|lower|slice:"-5:" == ".jpeg" or credential.document.url|lower|slice:"-4:" == ".png" %}
+                                        <i class="fas fa-file-image" style="color: green;"></i>
+                                    {% else %}
+                                        <i class="fas fa-file" style="color: gray;"></i>
+                                    {% endif %}
+                                </span>
+                                <a href="{{ credential.document.url }}" target="_blank" class="credential-link">
+                                    {{ credential.document.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                
+                    {% if credentials|length > 3 %}
+                        <button id="show-more-btn" onclick="toggleCredentials()">Show More</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-middle">
+                <button class="edit-expertise-btn">Edit Information</button>
+                <div class="expertise">
+                    <h3>Subject Expertise and Ratings</h3>
+{% for subject in subjects %}
+  <div class="subject">
+    <div class="subject-info">
+      <span class="subject-name">{{ subject.subject.name }}</span> - 
+      <span class="subject-rate">P{{ subject.price_per_hour }}/hour</span>
+    </div>
+  </div>
+{% empty %}
+  <p>No subjects added yet.</p>
+{% endfor %}
+
+                </div>
+
+                <div class="feedback">
+                    <h3>Feedbacks</h3>
+                    {% for review in reviews %}
+                        <p><strong>{{ review.parent.username }}</strong> 
+                            {% if review.rating == 5 %}★★★★★{% elif review.rating == 4 %}★★★★☆{% elif review.rating == 3 %}★★★☆☆{% elif review.rating == 2 %}★★☆☆☆{% else %}★☆☆☆☆{% endif %}
+                        </p>
+                        <p>{{ review.comment }}</p>
+                    {% empty %}
+                        <p>No feedback yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="profile-right">
+                <button class="edit-tutor-profile">Edit Information</button>
+                <div class="profile-image">
+                    {% if tutor.profile_photo %}
+                        <img src="{{ tutor.profile_photo.url }}" alt="Tutor Profile" />
+                    {% else %}
+                        <img src="{% static 'images/default-profile.jpg' %}" alt="Default Profile" />
+                    {% endif %}
+                </div>
+                <div class="name">
+                    <div class="name">
+                        <div class="info-row">
+                            <span class="label">Name:</span>
+                            <span class="value">{{ tutor.user.first_name|title }} {{ tutor.user.middle_name|title }} {{ tutor.user.last_name|title }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Email:</span>
+                            <span class="value">{{ tutor.user.email }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Gender:</span>
+                            <span class="value">{{ tutor.user.gender|title }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Home Address:</span>
+                            <span class="value">{{ tutor.user.street }}, {{ tutor.user.barangay }} {{ tutor.user.city }}.</span>
+                        </div>
+
+                        <div class="info-row" style="margin-top: 30px; display: flex; gap: 10px; align-items: center;">
+                            <span class="label" style="white-space: nowrap;">Application Status:</span>
+                            {% if is_approved %}
+                                <span class="value" style="color: green; font-weight: bold; white-space: nowrap;">Approved</span>
+                            {% elif is_declined %}
+                                <span class="value" style="color: red; font-weight: bold; white-space: nowrap;">Declined</span>
+                            {% elif is_restricted %}
+                                <span class="value" style="color: orange; font-weight: bold; white-space: nowrap;">Restricted</span>
+                            {% else %}
+                                <span class="value" style="color: gray; white-space: nowrap;">Pending </span>
+                            {% endif %}
+                        </div>
+                        
+                        
+                        
+                    </div>
+                    
+            </div>
+        </div>
+        </div>
+        
+    </div>
+    
+</body>
+
+{% include 'modal/edit_tutor_information.html' %}
+{% include 'modal/edit_expertise.html' %}
+
+{% include 'modal/edit_tutor_profile.html' %}
+
+
+
+
+
+{% include 'modal/edit_prof_suc.html' %}
+
+
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const subjectElements = document.querySelectorAll(".subject-name");
+      subjectElements.forEach(function (el) {
+        el.textContent = el.textContent.replace(/\s*\([^)]*\)/g, "").trim();
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const subjectElements = document.querySelectorAll(".subject-name");
+    subjectElements.forEach(function (el) {
+      el.textContent = el.textContent.replace(/\s*\([^)]*\)/g, "").trim();
+    });
+  });
+  </script>
+  
+
+
+
+
+
+
+
+   
+
+</html>

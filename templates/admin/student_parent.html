@@ -1,0 +1,117 @@
+    {% load static %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin - Parent Profile</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="icon" href="{% static 'images/owl.png' %}">
+        <link rel="stylesheet" href="{% static 'css/admin_student_parent.css' %}">
+        
+    </head>
+    <body>
+        {% include 'admin/sidebar.html' %}
+
+        <div class="dashboard-container">
+            <a href="{% url 'student_list' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Students List
+            </a>
+            
+            <div class="dashboard-header">
+                <h1><i class="fas fa-user-friends"></i> Parent Profile</h1>
+            </div>
+
+            <div class="parent-profile">
+                <div class="parent-header">
+                    {% if parent.profile_photo %}
+                        <img src="{{ parent.profile_photo.url }}" class="parent-avatar" alt="{{ parent.get_full_name }}">
+                    {% else %}
+                        <img src="{% static 'images/svg/user.svg' %}" class="parent-avatar" alt="Default avatar">
+                    {% endif %}
+                    <div class="parent-info">
+                        <h2>{{ parent.get_full_name }}</h2>
+                        <div class="parent-meta">
+                            <span><i class="fas fa-user"></i> {{ parent.get_gender_display }}</span>
+                            <span><i class="fas fa-phone"></i> {{ parent.phone_number|default:"No phone number" }}</span>
+                            <span><i class="fas fa-envelope"></i> {{ parent.email }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="parent-details">
+                    <div class="detail-card">
+                        <span class="detail-label">Username</span>
+                        <span class="detail-value">{{ parent.username }}</span>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-label">Account Status</span>
+                        <span class="detail-value">
+                            {% if parent.is_active %}
+                                <span style="color: green;">Active</span>
+                            {% else %}
+                                <span style="color: red;">Inactive</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-label">Date Joined</span>
+                        <span class="detail-value">{{ parent.date_joined|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-label">Address</span>
+                        <span class="detail-value">
+                            {{ parent.street }}, {{ parent.barangay }}, {{ parent.city }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="students-section">
+                <h3><i class="fas fa-user-graduate"></i> Children</h3>
+                
+                {% if students %}
+                    <div class="students-list">
+                        {% for student in students %}
+                        <div class="student-card">
+                            <div class="student-header">
+                                {% if student.profile_photo %}
+                                    <img src="{{ student.profile_photo.url }}" class="student-avatar" alt="{{ student.first_name }}">
+                                {% else %}
+                                    <img src="{% static 'images/svg/user.svg' %}" class="student-avatar" alt="Default avatar">
+                                {% endif %}
+                                <div class="student-info">
+                                    <h4>{{ student.first_name }} {{ student.last_name }}</h4>
+                                    <div class="student-meta">
+                                        <span>{{ student.get_gender_display }}</span>
+                                        <span>{{ student.age }} years old</span>
+                                        <span>{{ student.grade_level }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Birthday:</span>
+                                    <span class="detail-value">{{ student.birthday|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Address:</span>
+                                    <span class="detail-value">
+                                        {{ student.street }}, {{ student.barangay }}, {{ student.city }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <i class="fas fa-user-slash"></i>
+                        <p>No children registered for this parent.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+    </html>

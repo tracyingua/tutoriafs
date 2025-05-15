@@ -1,0 +1,338 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create an Account - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+  <style>
+    .required {
+      color: red;
+      margin-left: 4px;
+    }
+    .hidden-fields {
+      display: none;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+    .error-highlight {
+      border: 1px solid red !important;
+    }
+    .validation-errors {
+      color: red;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #ffeeee;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  {% include 'users/header.html' %}
+
+  <main class="create-account">
+    <div class="signup-container">
+      <div class="signup-welcome">
+        <h2>Welcome to <span class="brand-name">Tutoria</span></h2>
+        <p>Connecting you with the perfect tutor to achieve your learning goals.</p>
+        <img src="{% static 'images/owl.png' %}" alt="Welcome to Tutoria" class="owl-icon">
+      </div>
+      
+      <div class="signup-form">
+        <h3>Create an account</h3>
+        <p>To get started, you'll need an account.</p>
+
+        {% if error %}
+        <div class="alert alert-danger">
+          <ul style="list-style: none;">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li style="color: red;">{{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <div id="phase1-errors" class="validation-errors" style="display: none;"></div>
+
+        <form id="signup-form" action="{% url 'signup' %}" method="post">
+          {% csrf_token %}
+          
+          <!-- Phase 1: Personal Information -->
+          <div id="phase1">
+            <div id="first_name-error" class="error-message"></div>
+
+
+            <div id="email-error" class="error-message"></div>
+            <label for="email">Email<span class="required">*</span></label>
+            <input type="email" id="email" name="email" value="{{ form.email.value|default_if_none:'' }}" required>
+
+
+            <label for="username">Username<span class="required">*</span></label>
+            <input type="text" id="username" name="username" value="{{ form.username.value|default_if_none:'' }}" required>                                           
+
+            <label for="first_name">First Name<span class="required">*</span></label>
+            <input type="text" id="first_name" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}" required>
+          
+            <div id="middle_name-error" class="error-message"></div>
+            <label for="middle_name">Middle Name (Optional)</label>
+            <input type="text" id="middle_name" name="middle_name" value="{{ form.middle_name.value|default_if_none:'' }}">
+          
+            <div id="last_name-error" class="error-message"></div>
+            <label for="last_name">Last Name<span class="required">*</span></label>
+            <input type="text" id="last_name" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}" required>
+            <div id="username-error" class="error-message"></div>
+
+           
+           
+            
+           
+            <div id="phone_number-error" class="error-message"></div>
+            <label for="phone_number">Phone Number<span class="required">*</span></label>
+            <input type="text" id="phone_number" name="phone_number" value="{{ form.phone_number.value|default_if_none:'' }}" required>
+         
+            <div id="gender-error" class="error-message"></div>
+            <label for="gender">Gender<span class="required">*</span></label>
+            <select id="gender" name="gender" required>
+              <option value="" disabled {% if not form.gender.value %}selected{% endif %}>Select Gender</option>
+              <option value="male" {% if form.gender.value == 'male' %}selected{% endif %}>Male</option>
+              <option value="female" {% if form.gender.value == 'female' %}selected{% endif %}>Female</option>
+              <option value="other" {% if form.gender.value == 'other' %}selected{% endif %}>Other</option>
+            </select>
+           
+            <div class="next-btn-container" style="display: flex; align-items: center; justify-content: center;">
+              <button type="button" style="margin: 20px;" id="next-phase" class="btn-primary">Next</button>
+            </div>
+          </div>
+
+          <!-- Phase 2: Additional Information -->
+
+          <div id="phase2" style="display: none;">       
+            <button type="button" id="back-phase" class="btn-secondary" style="margin-top: 10px;">Return</button>
+
+            <div id="street-error" class="error-message"></div>
+            <label for="street">Street<span class="required">*</span></label>
+            <input type="text" id="street" name="street" value="{{ form.street.value|default_if_none:'' }}" required>
+           
+            <div id="barangay-error" class="error-message"></div>
+
+            <label for="barangay">Barangay<span class="required">*</span></label>
+            <input type="text" id="barangay" name="barangay" value="{{ form.barangay.value|default_if_none:'' }}" required>
+            
+            <div id="city-error" style="display: none;" class="error-message"></div>
+            <label for="city"><span class="required" style="display: none;">*</span></label>
+            <input type="text" id="city" name="city"style="display: none;" value="{{ form.city.value|default_if_none:'' }}" readonly required>
+         
+            <div id="password1-error" class="error-message"></div>
+            <label for="password1">Password<span class="required">*</span></label>
+            <div class="password-wrapper">
+              <input type="password" id="password1" name="password1" required>
+              <span class="toggle-password">
+                <img id="eye-icon1" src="{% static 'images/svg/eye1.svg' %}" alt="Show Password">
+              </span>
+            </div>
+           
+            <div id="password2-error" class="error-message"></div>
+
+            <label for="password2">Re-enter Password<span class="required">*</span></label>
+            <div class="password-wrapper">
+              <input type="password" id="password2" name="password2" required>
+              <span class="toggle-password">
+                <img id="eye-icon2" src="{% static 'images/svg/eye1.svg' %}" alt="Show Password">
+              </span>
+            </div>
+
+
+            <div  id="role-error" class="error-message"></div>
+            <p style="display: none;">Choose Role:<span class="required">*</span></p>
+            <div  style="display: none;" class="role-options">
+              <label>
+                <input type="radio" name="role" selected value="parent" {% if form.role.value == 'parent' %}checked{% endif %} required>
+                Parent/Guardian
+              </label>
+              <label>
+                <input type="radio" name="role" value="tutor" {% if form.role.value == 'tutor' %}checked{% endif %} required>
+                Tutor
+              </label>
+            </div>
+          
+
+            <button type="submit" class="btn-primary">SUBMIT</button>
+        
+          </div>
+
+          <!-- Hidden container to store phase 1 data when in phase 2 -->
+          <div id="hidden-fields-container" class="hidden-fields"></div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  {% include 'modal/success.html' %}
+  {% include 'modal/error.html' %}
+
+  <script src="{% static 'js/index.js' %}"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Password toggle functionality
+      function isEdgeBrowser() {
+        return /Edg\//.test(navigator.userAgent);
+      }
+
+      if (!isEdgeBrowser()) {
+        function setupPasswordToggle(inputId, iconId) {
+          const passwordField = document.getElementById(inputId);
+          const eyeIcon = document.getElementById(iconId);
+
+          passwordField.addEventListener("input", function () {
+            eyeIcon.style.display = this.value.length > 0 ? "block" : "none";
+          });
+
+          eyeIcon.addEventListener("click", function () {
+            if (passwordField.type === "password") {
+              passwordField.type = "text";
+              eyeIcon.src = "{% static 'images/svg/eye1.svg' %}";
+            } else {
+              passwordField.type = "password";
+              eyeIcon.src = "{% static 'images/svg/eye1.svg' %}";
+            }
+          });
+        }
+
+        setupPasswordToggle("password1", "eye-icon1");
+        setupPasswordToggle("password2", "eye-icon2");
+      }
+
+      // Phase navigation
+      document.getElementById("next-phase").addEventListener("click", function() {
+        // Validate phase 1 fields
+        const requiredFields = [
+          {id: 'first_name', name: 'First Name'},
+          {id: 'last_name', name: 'Last Name'},
+          {id: 'username', name: 'Username'},
+          {id: 'email', name: 'Email'},
+          {id: 'phone_number', name: 'Phone Number'},
+          {id: 'gender', name: 'Gender'}
+        ];
+        
+        let isValid = true;
+        const errorMessages = [];
+        const errorsContainer = document.getElementById("phase1-errors");
+        errorsContainer.innerHTML = '';
+        errorsContainer.style.display = 'none';
+
+        requiredFields.forEach(field => {
+          const element = document.getElementById(field.id);
+          const errorElement = document.getElementById(`${field.id}-error`);
+          errorElement.textContent = '';
+          element.classList.remove('error-highlight');
+
+          if (!element.value.trim()) {
+            isValid = false;
+            errorElement.textContent = `${field.name} is required`;
+            element.classList.add('error-highlight');
+            errorElement.textContent = `${field.name} is required`;
+            errorMessages.push(`${field.name} is required`);
+          }
+        });
+
+        if (!isValid) {
+          errorsContainer.style.display = 'none';
+          errorsContainer.innerHTML = `
+            
+           
+          `;
+          return;
+        }
+
+        // Move to phase 2
+        document.getElementById("phase1").style.display = "none";
+        document.getElementById("phase2").style.display = "block";
+      });
+
+      document.getElementById("back-phase").addEventListener("click", function() {
+        // Move back to phase 1
+        document.getElementById("phase1").style.display = "block";
+        document.getElementById("phase2").style.display = "none";
+      });
+
+      // Handle form submission to include all fields
+      document.getElementById("signup-form").addEventListener("submit", function(e) {
+        // If we're in phase 2, ensure all phase 1 fields are included
+        if (document.getElementById("phase2").style.display !== "none") {
+          const phase1Fields = [
+            'first_name', 'middle_name', 'last_name', 
+            'username', 'email', 'phone_number', 'gender'
+          ];
+          
+          const hiddenContainer = document.getElementById("hidden-fields-container");
+          hiddenContainer.innerHTML = '';
+          
+          phase1Fields.forEach(field => {
+            const originalInput = document.getElementById(field);
+            if (originalInput) {
+              const hiddenInput = document.createElement("input");
+              hiddenInput.type = "hidden";
+              hiddenInput.name = field;
+              hiddenInput.value = originalInput.value;
+              hiddenContainer.appendChild(hiddenInput);
+            }
+          });
+        }
+      });
+
+      // Clear error highlights when user starts typing
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          this.classList.remove('error-highlight');
+          const errorElement = document.getElementById(`${this.id}-error`);
+          if (errorElement) {
+            errorElement.textContent = '';
+          }
+        });
+      });
+    });
+
+    function signin() {
+      window.location.href = "{% url 'signin' %}"
+    }
+
+    function signup() {
+      window.location.href = "{% url 'signup' %}"
+    }
+  </script>
+
+  {% if success %}
+  <script>
+    showModal("{{ modal_title }}", "{{ modal_message }}");
+  </script>
+  {% endif %}
+
+  {% if error %}
+  <script>
+    showErrorModal("{{ error_title }}", "{{ error_message }}");
+  </script>
+  {% endif %}
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const parentRadio = document.querySelector('input[type="radio"][name="role"][value="parent"]');
+      if (parentRadio) {
+        parentRadio.checked = true;
+      }
+    });
+  </script>
+  
+
+</body>
+</html>

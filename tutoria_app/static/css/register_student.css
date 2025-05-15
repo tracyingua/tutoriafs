@@ -1,0 +1,187 @@
+body {
+    background-color: #f5f6fa;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+    padding: 20px;
+}
+
+
+.register-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 600px; 
+}
+
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.profile-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6da9ff;
+    color: black;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    transition: 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    transform: scale(1.1);
+}
+
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+
+label {
+    text-align: left;
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    display: block;
+}
+
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f1f1f1;
+    font-size: 14px;
+}
+
+
+.gender{
+     
+    width: 106%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f1f1f1;
+    font-size: 14px;
+
+}
+
+
+.grade{
+     
+    width: 106%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f1f1f1;
+    font-size: 14px;
+
+}
+#id_profile_photo {
+    display: none;
+  }
+  
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    background-color: #5AA9FF;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.back-button i {
+    margin-right: 8px;
+}
+
+.back-button:hover {
+    background-color: #3b8edb;
+}
+  
+
+
+.save-btn {
+    background-color: #6da9ff;
+    color: black;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.save-btn:hover {
+    background-color: #5599ee;
+}
+
+
+@media screen and (max-width: 480px) {
+    .register-card {
+        width: 100%;
+        padding: 20px;
+    }
+
+    input {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .gender{
+        width: 96%;
+
+
+    }
+
+    .save-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+}

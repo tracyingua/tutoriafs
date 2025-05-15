@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/tutoria_modal.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tutoria.css' %}">
+
+  <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+</head>
+
+<style>
+  .find-tutor{
+    padding: 15px 30px;
+    font-size: 18px; 
+    font-weight: bold;
+    border-radius: 8px; 
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+</style>
+<body>
+
+
+  <!-- Header Section -->
+  {% include 'users/navigation.html' %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="intro">
+      <h1 style="color: #76aced;">TUTORIA</h1>
+      <p>
+        We connect children with outstanding online tutors, helping them unlock their full potential. 
+        Our aim is to empower kids through personalized, high-quality education.
+      </p>
+      <div class="action-buttons">
+        <a 
+        href="https://mail.google.com/mail/?view=cm&fs=1&to=tutoriafs2024@gmail.com&su=Tutoria%20Inquiry&body=Hello%20Tutoria%20Team,"
+        target="_blank"
+        class="find-tutor"
+      >
+        Contact Admin
+      </a>
+      
+
+
+      
+        {% if user.is_authenticated and user.tutor_profile %}
+          <button type="button" class="become-tutor" onclick="showTutorModal()">Become a Tutor</button>
+        {% else %}
+          <form method="get" action="{% url 'switch_to_tutor' %}">
+            <button type="submit" class="become-tutor">Become a Tutor</button>
+          </form>
+        {% endif %}
+      </div>
+
+      <div id="tutor-modal" class="modal hidden">
+        <div class="modal-content">
+          <span class="modal-close" onclick="closeTutorModal()">×</span>
+
+          <div class="you">
+          <p>You are already a tutor.</p>
+        </div>
+          <a href="{% url 'switch_to_tutor' %}" class="modal-btn">Switch to Tutor Account</a>
+        </div>
+      </div>
+      
+      
+      
+      
+      
+    </section>
+    <div class="image-section" style="border: 5px #78a6dd;">
+      <img  style="  border: 5px solid #78a6dd;" src="{% static 'images/blue.png' %}" alt="Student studying online" class="student-image">
+      <div class="circle-decor"></div>
+    </div>
+  </main>
+
+
+  <script src="{% static 'js/index.js' %}"></script>
+
+
+  </script>
+
+  <script>
+    function showTutorModal() {
+      document.getElementById('tutor-modal').classList.remove('hidden');
+    }
+  
+    function closeTutorModal() {
+      document.getElementById('tutor-modal').classList.add('hidden');
+    }
+
+
+  </script>
+  
+</body>
+</html>

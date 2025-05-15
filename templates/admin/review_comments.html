@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tutor Reviews | Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/review_comments.css' %}"/>
+  <link rel="icon" href="{% static 'images/owl.png' %}"/>
+</head>
+
+<body>
+  {% include 'admin/sidebar.html' %}
+
+  <div class="dashboard-container">
+    <div class="tutor-header">
+      <a href="{% url 'reviews' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to All Tutors
+      </a>
+
+      <div class="tutor-profile">
+        {% if tutor.profile_photo %}
+          <img src="{{ tutor.profile_photo.url }}" class="tutor-avatar">
+        {% else %}
+          <img src="{% static 'images/default_avatar.jpg' %}" class="tutor-avatar">
+        {% endif %}
+        <div class="tutor-info">
+          <h1>{{ tutor.user.get_full_name|default:tutor.user.username }}</h1>
+          <div class="rating-summary">
+            <div class="stars">
+              {% with tutor.average_rating|floatformat:0 as stars %}
+                {% for i in "12345" %}
+                  {% if forloop.counter <= stars %}
+                    <i class="fas fa-star"></i>
+                  {% else %}
+                    <i class="far fa-star"></i>
+                  {% endif %}
+                {% endfor %}
+              {% endwith %}
+              <span class="rating-value">{{ tutor.average_rating|floatformat:1 }}</span>
+              <span class="review-count">({{ tutor.reviews.count }} review{{ tutor.reviews.count|pluralize }})</span>
+            </div>
+          </div>
+          <div class="tutor-meta">
+            <span><i class="fas fa-graduation-cap"></i> {{ tutor.subjects.count }} subjects</span>
+            <span><i class="fas fa-clock"></i> {{ tutor.availability_times.count }} availability slots</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="filter-form" class="review-filters" onsubmit="return false;">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" name="search" placeholder="Search reviews..." value="{{ request.GET.search }}"/>
+      </div>
+
+      <div class="filter-group">
+        <label for="sort">Sort:</label>
+        <select name="sort" id="sort">
+          <option value="-created_at" {% if request.GET.sort == "-created_at" %}selected{% endif %}>Newest First</option>
+          <option value="created_at" {% if request.GET.sort == "created_at" %}selected{% endif %}>Oldest First</option>
+          <option value="-rating" {% if request.GET.sort == "-rating" %}selected{% endif %}>Highest Rating</option>
+          <option value="rating" {% if request.GET.sort == "rating" %}selected{% endif %}>Lowest Rating</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="rating">Rating:</label>
+        <select name="rating" id="rating">
+          <option value="" {% if not request.GET.rating %}selected{% endif %}>All Ratings</option>
+          <option value="5" {% if request.GET.rating == "5" %}selected{% endif %}>5 Stars</option>
+          <option value="4" {% if request.GET.rating == "4" %}selected{% endif %}>4 Stars</option>
+          <option value="3" {% if request.GET.rating == "3" %}selected{% endif %}>3 Stars</option>
+          <option value="2" {% if request.GET.rating == "2" %}selected{% endif %}>2 Stars</option>
+          <option value="1" {% if request.GET.rating == "1" %}selected{% endif %}>1 Star</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="reviews-container" id="reviews-container">
+      {% if page_obj %}
+        {% for review in page_obj %}
+        <div class="review-card" 
+             data-rating="{{ review.rating }}" 
+             data-date="{{ review.created_at|date:'Y-m-d H:i:s' }}">
+          <div class="review-header">
+            <div class="reviewer-info">
+              {% if review.parent.profile_photo %}
+                <img src="{{ review.parent.profile_photo.url }}" class="reviewer-avatar">
+              {% else %}
+                <img src="{% static 'images/svg/user.svg' %}" class="reviewer-avatar">
+              {% endif %}
+              <div>
+                <h4 class="reviewer-name">{{ review.parent.user.get_full_name|default:review.parent.username }}</h4>
+                <div class="review-rating">
+                  {% for i in "12345" %}
+                    <i class="fas fa-star{% if forloop.counter > review.rating %}-empty{% endif %}"></i>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+          </div>
+          
+          <div class="review-content">
+            <p class="review-text">{{ review.comment }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-reviews">
+          <i class="far fa-comment-alt"></i>
+          <p>No reviews found for this tutor.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination">
+      <div class="pagination-controls">
+        {% if page_obj.has_previous %}
+          <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}" 
+             class="page-link" title="First Page">
+            <i class="fas fa-angle-double-left"></i>
+          </a>
+          <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}" 
+             class="page-link" title="Previous">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        {% else %}
+          <span class="page-link disabled">
+            <i class="fas fa-angle-double-left"></i>
+          </span>
+          <span class="page-link disabled">
+            <i class="fas fa-chevron-left"></i>
+          </span>
+        {% endif %}
+
+        <div class="page-numbers">
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <span class="page-link current-page">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}" 
+                 class="page-link">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}" 
+             class="page-link" title="Next">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+          <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}" 
+             class="page-link" title="Last Page">
+            <i class="fas fa-angle-double-right"></i>
+          </a>
+        {% else %}
+          <span class="page-link disabled">
+            <i class="fas fa-chevron-right"></i>
+          </span>
+          <span class="page-link disabled">
+            <i class="fas fa-angle-double-right"></i>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.querySelector('input[name="search"]');
+      const sortSelect = document.querySelector('select[name="sort"]');
+      const ratingSelect = document.querySelector('select[name="rating"]');
+      const reviewCards = Array.from(document.querySelectorAll('.review-card'));
+      const reviewsContainer = document.getElementById('reviews-container');
+      const filterForm = document.getElementById('filter-form');
+
+      // Only run client-side filtering if we're on page 1 without filters
+      const shouldFilterClientSide = window.location.search.includes('page=1') || 
+                                   !window.location.search.includes('page=');
+
+      if (shouldFilterClientSide) {
+        function filterAndSort() {
+          const search = searchInput.value.toLowerCase();
+          const ratingFilter = ratingSelect.value;
+          const sortValue = sortSelect.value;
+
+          let filtered = reviewCards.filter(card => {
+            const rating = card.getAttribute('data-rating');
+            const text = card.querySelector('.review-text').innerText.toLowerCase();
+            const name = card.querySelector('.reviewer-name').innerText.toLowerCase();
+
+            const matchesSearch = text.includes(search) || name.includes(search);
+            const matchesRating = !ratingFilter || rating === ratingFilter;
+
+            return matchesSearch && matchesRating;
+          });
+
+          filtered.sort((a, b) => {
+            if (sortValue === 'created_at') {
+              return new Date(a.dataset.date) - new Date(b.dataset.date);
+            } else if (sortValue === '-created_at') {
+              return new Date(b.dataset.date) - new Date(a.dataset.date);
+            } else if (sortValue === 'rating') {
+              return a.dataset.rating - b.dataset.rating;
+            } else if (sortValue === '-rating') {
+              return b.dataset.rating - a.dataset.rating;
+            }
+            return 0;
+          });
+
+          reviewsContainer.innerHTML = '';
+          if (filtered.length === 0) {
+            reviewsContainer.innerHTML = `
+              <div class="no-reviews">
+                <i class="far fa-comment-alt"></i>
+                <p>No matching reviews found.</p>
+              </div>`;
+          } else {
+            filtered.forEach(card => reviewsContainer.appendChild(card));
+          }
+        }
+
+        searchInput.addEventListener('input', () => {
+          setTimeout(filterAndSort, 300);
+        });
+
+        sortSelect.addEventListener('change', filterAndSort);
+        ratingSelect.addEventListener('change', filterAndSort);
+      } else {
+        // Server-side filtering - submit form when filters change
+        filterForm.addEventListener('change', () => {
+          filterForm.submit();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

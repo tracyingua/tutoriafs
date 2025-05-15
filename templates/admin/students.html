@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Students List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/admin_student.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="{% static 'images/owl.png' %}">
+</head>
+<body>
+    {% include 'admin/sidebar.html' %}
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-user-graduate"></i> Students Management</h1>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search students or parents...">
+            </div>
+        </div>
+
+        <div class="students-list" id="studentsContainer">
+            {% for student in students %}
+            <div class="student-card" data-search="{{ student.first_name|lower }} {{ student.last_name|lower }} {{ student.parent.first_name|lower }} {{ student.parent.last_name|lower }} {{ student.grade_level|lower }} {{ student.barangay|lower }} {{ student.city|lower }}">
+                <div class="student-header">
+                    {% if student.profile_photo %}
+                        <img src="{{ student.profile_photo.url }}" class="student-avatar" alt="{{ student.first_name }}">
+                    {% else %}
+                        <img src="{% static 'images/default_avatar.jpg' %}" class="student-avatar" alt="Default avatar">
+                    {% endif %}
+                    <div class="student-info">
+                        <h3>{{ student.first_name }} {{ student.last_name }}</h3>
+                        <div class="student-meta">
+                            <span><i class="fas fa-user"></i> {{ student.get_gender_display }}</span>
+                            <span style="margin-left: 20px;"><i class="fas fa-child"></i> {{ student.get_age }} years old</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="student-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Parent:</span>
+                        <a href="{% url 'parent_profile' student.parent.id %}" class="detail-value" style="color: var(--primary-color); text-decoration: none;">
+                            {{ student.parent.get_full_name }}
+                            <i class="fas fa-external-link-alt" style="margin-left: 5px; font-size: 0.8em;"></i>
+                        </a>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Grade Level:</span>
+                        <span class="detail-value">{{ student.grade_level }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Birthday:</span>
+                        <span class="detail-value">{{ student.birthday|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span class="detail-value">
+                            {{ student.street }}, {{ student.barangay }}, {{ student.city }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <p>No students found matching your criteria.</p>
+        </div>
+
+
+        {% if students.paginator.num_pages > 1 %}
+        <div class="pagination">
+          <div class="pagination-controls">
+            {% if students.has_previous %}
+              <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                 class="page-link" title="First Page">
+                <i class="fas fa-angle-double-left"></i>
+              </a>
+              <a href="?page={{ students.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                 class="page-link" title="Previous">
+                <i class="fas fa-chevron-left"></i>
+              </a>
+            {% else %}
+              <span class="page-link disabled">
+                <i class="fas fa-angle-double-left"></i>
+              </span>
+              <span class="page-link disabled">
+                <i class="fas fa-chevron-left"></i>
+              </span>
+            {% endif %}
+      
+            <div class="page-numbers">
+              {% for num in students.paginator.page_range %}
+                {% if students.number == num %}
+                  <span class="page-link current-page">{{ num }}</span>
+                {% elif num > students.number|add:'-3' and num < students.number|add:'3' %}
+                  <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                     class="page-link">{{ num }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+      
+            {% if students.has_next %}
+              <a href="?page={{ students.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                 class="page-link" title="Next">
+                <i class="fas fa-chevron-right"></i>
+              </a>
+              <a href="?page={{ students.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                 class="page-link" title="Last Page">
+                <i class="fas fa-angle-double-right"></i>
+              </a>
+            {% else %}
+              <span class="page-link disabled">
+                <i class="fas fa-chevron-right"></i>
+              </span>
+              <span class="page-link disabled">
+                <i class="fas fa-angle-double-right"></i>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+      
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const studentCards = document.querySelectorAll('.student-card');
+            const studentsContainer = document.getElementById('studentsContainer');
+            const noResultsMessage = document.getElementById('noResults');
+
+            let visibleStudents = studentCards.length;
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                visibleStudents = 0;
+                
+                studentCards.forEach(card => {
+                    const searchData = card.getAttribute('data-search');
+                    if (searchData.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        visibleStudents++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+             
+                if (visibleStudents === 0 && searchTerm.length > 0) {
+                    noResultsMessage.style.display = 'block';
+                    studentsContainer.style.display = 'none';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                    studentsContainer.style.display = 'grid';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutor Profile</title>
+    <link rel="stylesheet" href="{% static 'css/teacher_profile_2.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/teacher_profile.css' %}" />
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+  </head>
+
+  {% include 'users/navigation.html' %}
+  <body>
+    <div class="tutor-profile-container">
+      <div class="tutor-left">
+        <h2 class="tutor-heading">Tutor Profile</h2>
+        <div class="tutor-image">
+          <img src="{{ tutor.profile_photo.url }}" alt="Tutor Profile" />
+        </div>
+        <div class="profile-details">
+          <h3 class="tutor-name">{{ tutor.user.get_full_name | title }}</h3>
+          <p class="tutor-email">
+              <img src="{% static 'images/svg/envelope.svg' %}" alt="Email Icon">
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ tutor.user.email }}" target="_blank">
+                {{ tutor.user.email }}
+            </a>
+            
+          </p>
+      </div>
+        <p class="tutor-description">
+        
+        </p>
+
+        <hr class="tutor-divider" />
+
+        <div class="tutor-buttons">
+   
+          <button  class="schedule-btn">Schedule </button>
+          <a href="{% url 'teacher_profile' tutor.id %}" class="back-btn">Back</a>
+        </div>
+      </div>
+
+      <div class="tutor-right">
+        <div class="tutor-credentials">
+          <h3>Credentials</h3>
+          <div class="credentials-section">
+            <h3>Credentials</h3>
+        
+            {% for credential in credentials %}
+            <div class="credential-item">
+                {% with credential.document.url|lower as doc_url %}
+                    {% if doc_url|slice:"-4:" == ".pdf" %}
+                        <i class="fas fa-file-pdf" style="color: #d9534f; margin-right: 8px;"></i>
+                    {% elif doc_url|slice:"-4:" == ".jpg" or doc_url|slice:"-5:" == ".jpeg" or doc_url|slice:"-4:" == ".png" %}
+                        <i class="fas fa-file-image" style="color: #4CAF50; margin-right: 8px;"></i>
+                    {% elif doc_url|slice:"-4:" == ".doc" or doc_url|slice:"-5:" == ".docx" %}
+                        <i class="fas fa-file-word" style="color: #2B579A; margin-right: 8px;"></i>
+                    {% elif doc_url|slice:"-4:" == ".xls" or doc_url|slice:"-5:" == ".xlsx" %}
+                        <i class="fas fa-file-excel" style="color: #217346; margin-right: 8px;"></i>
+                    {% elif doc_url|slice:"-4:" == ".txt" %}
+                        <i class="fas fa-file-alt" style="color: #6c757d; margin-right: 8px;"></i>
+                    {% else %}
+                        <i class="fas fa-file" style="color: #6c757d; margin-right: 8px;"></i>
+                    {% endif %}
+                {% endwith %}
+        
+                <span class="credential-text" style="margin-right: 10px;">
+                    {{ credential.document.name|cut:"credentials/" }}
+                </span>
+        
+                <a href="{{ credential.document.url }}" class="credential-attachment" target="_blank" style="color: red; font-weight: bold;">
+                    View File
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="feedback-section">
+          <h3 class="feedback-title">Feedbacks</h3>
+      
+          {% if feedbacks %}
+              {% for feedback in feedbacks %}
+                  <div class="feedback-item {% if forloop.counter > 5 %}hidden-feedback{% endif %}">
+                      <strong>
+                          {% with full_name=feedback.parent.get_full_name %}
+                              {% if full_name and full_name.strip %}
+                                  {{ full_name | title }}
+                              {% else %}
+                                  {{ feedback.parent.username | title }}
+                              {% endif %}
+                          {% endwith %}
+                          
+                          {% for i in "12345" %}
+                              {% if forloop.counter <= feedback.rating %}
+                                  ★
+                              {% else %}
+                                  ☆
+                              {% endif %}
+                          {% endfor %}
+                      </strong>
+                      <p>{{ feedback.comment }}</p>
+                  </div>
+              {% endfor %}
+          {% else %}
+              <p style="margin-bottom: 20px;">No feedbacks yet.</p>
+          {% endif %}
+      
+          {% if feedbacks|length > 5 %}
+          <button class="show-more" id="showMoreBtn">Show More</button>
+          {% endif %}
+          
+     
+          <button class="feedback-btn">Give Feedback</button>
+      </div>
+      
+      {% include 'modal/schedule.html' %}
+
+        
+      </div>
+    </div>
+
+    {% include 'modal/sch_suc.html' %}
+    {% include 'modal/feed_suc.html' %}
+
+    {% include 'modal/feedback.html' %}
+
+    <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/schedule.js' %}"></script>
+
+    <script src="{% static 'js/feedback.js' %}"></script>
+
+    <script>
+   
+    </script>
+
+  
+  </body>
+</html>

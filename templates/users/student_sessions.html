@@ -1,0 +1,392 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Sessions - {{ subject.name }}</title>
+    <link rel="stylesheet" href="{% static 'css/student_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/student_sessions.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/student_session.js'}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   
+</head>
+
+
+
+<body>
+    {% include 'users/navigation.html' %}
+
+    <section class="back-button-wrapper"> 
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+    </section>
+
+    <div class="student-profile-container">
+        <div class="student-right">
+            <div class="subject-tutor-section">
+                <h2>
+                    {{ subject.name }} Sessions 
+                    {% if tutors_involved|length > 1 %}
+                        with Multiple Tutors
+                    {% else %}
+                        with {{ tutors_involved|first|default:"Tutor" }}
+                    {% endif %}
+                </h2>
+
+
+                <div class="tutors-list">
+                    <h4>Tutors Involved:</h4>
+                    <ul>
+                            {% for tutor in tutors_involved %}
+                                <li>{{ tutor }}</li>
+                            {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span>Progress Towards Completion</span>
+                        <span>{{ completion_percentage|floatformat:1 }}% Complete</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span>Completed: {{ completed_hours|floatformat:2 }} hours</span>
+                        <span>Total: {{ total_hours|floatformat:2 }} hours</span>
+                    </div>
+                </div>
+
+                <div class="financial-summary">
+                    <div class="financial-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <div>
+                            <h4>Total Amount</h4>
+                            <p>₱{{ total_amount|floatformat:2 }}</p>
+                        </div>
+                    </div>
+                    <div class="financial-card">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <div>
+                            <h4>Paid Amount</h4>
+                            <p>₱{{ paid_amount|floatformat:2 }}</p>
+                        </div>
+                    </div>
+                    <div class="financial-card {% if balance_due > 0 %}balance-due{% endif %}">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <div>
+                            <h4>Balance Due</h4>
+                            <p>₱{{ balance_due|floatformat:2 }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schedule-section">
+                    <h3 class="section-title-bottom">Session Schedule</h3>
+
+                    <div class="filters">
+                        <div class="filter-item">
+                            <label for="status-filter">Status:</label>
+                            <select id="status-filter" class="filter-select">
+                                <option value="">All</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="canceled">Canceled</option>
+                                <option value="canceled_by_parent">Canceled by Parent</option>
+                            </select>
+                        </div>
+                    </div>
+                   <table class="schedule-table" id="schedule-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th> Start Time</th>
+            <th> End Time</th>
+            <th>Duration</th>
+            <th>Day</th>
+            <th> Substitute Tutor</th>  <!-- New column -->
+            <th>Status</th>
+            <th>Action/Reason</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in page_obj %}
+        <tr>
+            <td>{{ session.date|date:"M d, Y" }}</td>
+            <td>
+                {% if session.start_time %}
+                    {{ session.start_time|time:"g:i A" }} 
+                {% else %}
+                    Not scheduled
+                {% endif %}
+            </td>
+            <td>
+                {% if session.end_time %}
+                    {{ session.end_time|time:"g:i A" }}
+                {% else %}
+                    Not schedule
+                {% endif %}
+            </td>
+            
+            <td>
+                {{ session.duration|floatformat:"-2" }} hour{{ session.duration|pluralize }}
+            </td>
+            
+            <td>{{ session.date|date:"D" }}</td>
+            <td>
+                {% if session.is_substitute %}
+                    <div class="substitute-info">
+                        {{ session.substitute_name }} (Substitute)
+                        {% if session.substitute_contact %}
+                            <br><small>{{ session.substitute_contact }}</small>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            
+            <td class="status-{{ session.status }}">
+                {% if session.status == 'canceled_by_parent' %}
+                    Canceled by Parent
+                {% else %}
+                    {{ session.get_status_display }}
+                {% endif %}
+            </td>
+            <td>
+                {% if session.status == 'pending' or session.status == 'confirmed' %}
+                    <div class="btn-cancel-container">
+                        <button class="btn-cancel-session" 
+                                data-session-id="{{ session.id }}"
+                                data-status="{{ session.status }}">
+                            Cancel
+                        </button>
+                    </div>
+                {% elif session.status in 'canceled canceled_by_parent canceled_by_tutor' and session.cancellation_reason %}
+                    <div class="cancellation-reason" title="{{ session.cancellation_reason }}">
+                        {{ session.cancellation_reason|truncatechars:20 }}
+                    </div>
+                {% else %}
+                    <span class="no-action">-</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No sessions scheduled yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <div class="step-links">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1" title="First Page"><i class="fas fa-angles-left"></i> First</a>
+                                <a href="?page={{ page_obj.previous_page_number }}" title="Previous Page"><i class="fas fa-arrow-left"></i> Prev</a>
+                            {% endif %}
+                    
+                            <span class="current" title="Current Page">
+                                <i class="fas fa-book-open-reader"></i>
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                    
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" title="Next Page">Next <i class="fas fa-arrow-right"></i></a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}" title="Last Page">Last <i class="fas fa-angles-right"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <!-- Cancel Session Modal -->
+        
+        <div id="cancelModal" class="modal">
+            <div class="modal-content">
+                <span style="display: none;" class="close">&times;</span>
+                <h3>Cancel Session</h3>
+                <p id="cancelModalText">Are you sure you want to cancel this session?</p>
+                <form id="cancelForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="cancelSessionId" name="booking_id">
+                    
+                    <!-- Select reason for cancellation -->
+                    <div class="form-group">
+                        <label  style="margin-top: 20px;"   for="cancelReasonType">Reason for cancellation:</label>
+                        <select  style="border: 1px solid black;"   id="cancelReasonType" name="reason_type" class="form-select" required>
+                            <option value="">Select a reason</option>
+                            <option value="schedule_conflict">Schedule conflict</option>
+                            <option value="student_request">Student request</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="other">Other (please specify)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Specify reason for cancellation -->
+                    <div class="form-group" id="otherReasonContainer" style="display: none;">
+                        <label for="cancelReason">Please specify:</label>
+                        <textarea id="cancelReason" name="reason" rows="3" class="form-input" placeholder="Enter your reason here..."></textarea>
+                    </div>
+                    
+                    <!-- Cancelation buttons -->
+                    <div class="confirm-cancel-container">
+                        <button type="submit" class="btn-confirm-cancel">Confirm Cancellation</button>
+                        <button type="button" class="btn-cancel-modal">Go Back</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+
+
+        <!-- Message Modal -->
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="messageTitle">Message Title</h3>
+                <p id="messageContent">Message content goes here</p>
+                <button id="messageClose" class="btn-accept">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#progressFill').css('width', '{{ completion_percentage|default:0 }}%');
+            
+            const cancelModal = $('#cancelModal');
+            const messageModal = $('#messageModal');
+            const closeBtns = $('.close');
+            const cancelModalBtn = $('.btn-cancel-modal');
+            const messageCloseBtn = $('#messageClose');
+            
+            // Show/hide other reason textarea based on selection
+            $('#cancelReasonType').change(function() {
+                if ($(this).val() === 'other') {
+                    $('#otherReasonContainer').show();
+                    $('#cancelReason').prop('required', true);
+                } else {
+                    $('#otherReasonContainer').hide();
+                    $('#cancelReason').prop('required', false);
+                }
+            });
+    
+            $('.btn-cancel-session').click(function() {
+                const sessionId = $(this).data('session-id');
+                const sessionDate = $(this).closest('tr').find('td:first').text();
+                $('#cancelSessionId').val(sessionId);
+                $('#cancelModalText').text(`Are you sure you want to cancel the session on ${sessionDate}? This action cannot be undone.`);
+                
+                // Reset form when opening modal
+                $('#cancelReasonType').val('');
+                $('#otherReasonContainer').hide();
+                $('#cancelReason').val('');
+                
+                cancelModal.show();
+            });
+            
+            closeBtns.add(cancelModalBtn).click(function() {
+                cancelModal.hide();
+                messageModal.hide();
+            });
+    
+            messageCloseBtn.click(function() {
+                messageModal.hide();
+                location.reload();
+            });
+            
+            $(window).click(function(event) {
+                if ($(event.target).hasClass('modal')) {
+                    cancelModal.hide();
+                    messageModal.hide();
+                }
+            });
+            
+            $('#cancelForm').submit(function(e) {
+                e.preventDefault();
+                
+                // Validate reason is selected
+                if (!$('#cancelReasonType').val()) {
+                    showMessage("Error", "Please select a cancellation reason");
+                    return;
+                }
+                
+                const formData = $(this).serialize();
+                const $cancelBtn = $(`.btn-cancel-session[data-session-id="${$('#cancelSessionId').val()}"]`);
+                
+                $.ajax({
+                    url: "{% url 'cancel_session' %}",
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function() {
+                        $cancelBtn.prop('disabled', true).text('Cancelling...');
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            const $row = $cancelBtn.closest('tr');
+                            const $statusCell = $row.find('td:nth-child(5)');
+                            const sessionDate = $row.find('td:first').text();
+                            
+                            if (response.canceled_by === 'parent') {
+                                $statusCell.text('Canceled by Parent')
+                                    .removeClass()
+                                    .addClass('status-canceled_by_parent');
+                            } else {
+                                $statusCell.text('Canceled')
+                                    .removeClass()
+                                    .addClass('status-canceled');
+                            }
+                            
+                            $cancelBtn.replaceWith('<span class="no-action">-</span>');
+                            
+                            const cancelMessage = `Session on ${sessionDate} has been successfully canceled.`;
+                            cancelModal.hide();
+                            showMessage("Success", cancelMessage);
+                        } else {
+                            showMessage("Error", response.error || "Failed to cancel session");
+                            $cancelBtn.prop('disabled', false).text('Cancel');
+                        }
+                    },
+                    error: function(xhr) {
+                        showMessage("Error", xhr.responseJSON?.error || "An error occurred while cancelling the session");
+                        $cancelBtn.prop('disabled', false).text('Cancel');
+                    }
+                });
+            });
+            
+            $('#status-filter').change(function() {
+                const status = $(this).val().toLowerCase();
+                $('#schedule-table tbody tr').each(function() {
+                    const $row = $(this);
+                    let rowStatus = $row.find('td:nth-child(5)').text().toLowerCase();
+                    rowStatus = rowStatus.replace('by parent', '').trim();
+                    
+                    if (!status || rowStatus.includes(status)) {
+                        $row.show();
+                    } else {
+                        $row.hide();
+                    }
+                });
+            });
+            
+            function showMessage(title, content) {
+                $('#messageTitle').text(title);
+                $('#messageContent').text(content);
+                messageModal.show();
+            }
+        });
+    
+        function goBack() {
+            window.location.href = "{% url 'student_profile' student.id %}";
+        }
+    </script>
+  
+</body>
+</html>

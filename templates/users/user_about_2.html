@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/user_about_2.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}">
+</head>
+<body>
+  {% include 'users/header2.html' %}
+
+  <main class="about-page">
+    <section class="form-container">
+      <h1>About</h1>
+      <p class="description">
+        Start creating your public tutor profile. Your progress will be automatically saved as you complete each section.
+        You can return at any time to finish your registration.
+      </p>
+
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-grid">
+          <!-- Left Section: Profile Photo -->
+          <div class="left-section bordered-box">
+            <div class="page-wrapper">
+              <div class="profile-container">
+                <h2 class="profile-title">Profile photo</h2>
+                <p class="profile-subtext">Choose a photo that will help learners get to know you.</p>
+                <hr class="divider">
+
+                <div class="profile-card">
+                  <div class="upload-box2"  onclick="document.getElementById('profileUpload').click()">
+                    <div class="upload-placeholder">
+                      <span>JPEG or PNG, max <br> 5MB</span>
+                    </div>
+                    
+                  </div>
+                  <input type="file" name="profile_photo" id="profileUpload" style="display: none;"  accept="image/jpeg, image/png" required onchange="displayImage(event)">
+
+                  <div class="profile-info">
+                    <h3 class="profile-name">
+                      {{ user_first_name }} {{ user_last_name }}
+                    </h3>
+
+                    
+                  </div>
+                </div>
+
+                <hr class="divider">
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Section: Document Upload -->
+          <div class="right-section bordered-box">
+            <div class="input-group">
+              <div class="upload-section">
+                <div class="upload-box">
+                  <div class="upload-icon">
+                    <img src="{% static 'images/svg/upload.svg' %}" alt="Upload Icon">
+                  </div>
+                  <p>Upload documents for your credentials</p>
+                  <input type="file" id="fileUpload" name="credential_documents" multiple style="display: none;" onchange="startUpload(event)">
+
+                  <button id="browseBtn" type="button" onclick="handleBrowseClick(event)">Browse Files</button>
+                </div>
+
+                <div id="filePreviewContainer" class="file-preview-container"></div>
+
+                <!-- Progress Container (Hidden Initially) -->
+                <div id="progressContainer" class="progress-container hidden">
+                  <span class="file-badge">DOC</span>
+                  <progress id="uploadProgress" value="0" max="100"></progress>                 
+                  <span id="progressText" class="progress-text">0%</span>
+                  <button id="cancelButton" class="remove-file" onclick="cancelUpload()">✖</button>
+                </div>
+
+                <!-- Upload Complete Message -->
+                <div id="uploadComplete" class="upload-complete hidden">
+                  <span>Upload Complete</span>
+                  <button id="reUploadBtn" onclick="reUpload()">Re-upload</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confirmation and Submit -->
+            <div class="form-footer">
+              <div class="checkbox-container">
+                <input type="checkbox" id="age-confirmation" name="is_over_18" required>
+                <label class="ageLabel" for="age-confirmation">I confirm I'm over 18 years old</label>
+              </div>
+              <button type="submit" class="save-button">Save and Continue</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="{% static 'js/user_about_2.js' %}"></script>
+  <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>

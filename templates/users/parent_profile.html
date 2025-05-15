@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parent Profile - Tutoria</title>
+  <link rel="stylesheet" href="{% static 'css/parent_profile.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+  {% include 'users/navigation.html' %}
+
+  <main class="profile-container">
+    <div class="profile-wrapper">
+
+    
+      <div class="parent-profile">
+        <h2>Parent Profile</h2>
+        <div class="profile-card">
+            {% if user.profile_photo %}
+                <img src="{{ user.profile_photo.url }}" alt="Parent Photo" class="parent-photo">
+            {% else %}
+                <img src="{% static 'images/svg/user1.svg' %}" alt="Parent Photo" class="parent-photo">
+            {% endif %}
+            <p><strong>Name:</strong> {{ user.first_name | title }} {{ user.middle_name | title }} {{ user.last_name | title }} </p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Home Address:</strong> {{ user.street | title}}, {{ user.barangay | title}}, {{ user.city}}, </p> 
+        </div>
+        <a href="{% url 'edit_parent_profile' %}" class="edit-btn">EDIT PROFILE</a>
+
+
+
+    </div>
+    
+    
+    
+
+    
+      <div class="student-section">
+        <a href="{% url 'register_student' %}" class="register-btn">REGISTER A STUDENT</a>
+                                           
+        <a href="{% url 'student_schedules' %}" class="schedule-btn">VIEW ALL STUDENT'S SCHEDULES</a>
+
+        <h2>REGISTERED STUDENTS</h2>
+        
+        <div class="student-list">
+          {% for student in students %}
+              <div class="student-card">
+                  <img src="{% if student.profile_photo %}{{ student.profile_photo.url }}{% else %}{% static 'images/svg/user.svg' %}{% endif %}" alt="Student" class="student-photo">
+      
+                  <div class="student-info">
+                      <h3>  {{ student.first_name }}  {{ student.last_name }}.</h3>
+             
+                    
+                  </div>
+      
+                  <div class="button-group">
+                
+
+                    <a href="{% url 'student_profile' student.id %}" class="btn view-btn">View Student</a>
+
+                    
+                   
+                    <form action="{% url 'find_tutor' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                        <button type="submit" class="btn view-btn">Find Tutor</button>
+                    </form>
+
+
+                </div>
+                
+              </div>
+          {% empty %}
+              <p>No registered students yet.</p>
+          {% endfor %}
+      </div>
+      
+        
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="{% static 'js/hamburger.js' %}"></script>
+</body>
+</html>

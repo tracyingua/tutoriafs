@@ -1,0 +1,311 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Tutoria</title>
+ 
+    <link rel="stylesheet" href="{% static 'css/user_about_2.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user_about_3.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+    <style>
+        .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+    </style>
+</head>
+<body>
+    {% include 'users/header2.html' %}
+
+    <main class="about-page">
+        <section class="form-container">
+            <h1>Tutor Building Profile</h1>
+            <p class="description">
+                Start creating your public tutor profile. Your progress will be automatically saved as you complete each section. 
+                You can return at any time to finish your registration.
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <!-- Left Section -->
+                    <div class="left-section bordered-box" style="height: 100%;">
+                        <!-- Subjects -->
+                        <div class="input-group" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                            <label>Subjects you teach</label>
+                            <div class="checkbox-scroll-container" id="subjects-container">
+                                {% for subject in subjects %}
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects[]" style="pointer-events: none;"    value="{{ subject.id }}" 
+                                           onchange="filterTopics()">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">{{ subject.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Topics -->
+<div class="input-group" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+    <label>Topics</label>
+
+    <!-- Select All Topics (hidden initially) -->
+    <label class="checkbox-label" id="select-all-topics-wrapper" style="display: none; width: 90%; align-items: center; gap: 8px; margin-bottom: 5px; margin-left: 5px;">
+        <input type="checkbox" id="select-all-topics">
+        <span class="checkbox-custom"></span>
+        <span class="checkbox-text">Select All Topics</span>
+    </label>
+
+    <div class="checkbox-scroll-container" id="topics-container">
+        {% for topic in topics %}
+        <label class="checkbox-label" data-subject="{{ topic.subject.id }}" style="display: none;">
+            <input type="checkbox" name="topics[]" value="{{ topic.id }}" onchange="filterSubTopics()">
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">{{ topic.name }}</span>
+        </label>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Subtopics -->
+<div class="input-group" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+    <label>Sub-topic</label>
+
+    <!-- Select All Subtopics (hidden initially) -->
+    <label class="checkbox-label" id="select-all-subtopics-wrapper" style="display: none; width: 90%; align-items: center; gap: 8px; margin-bottom: 5px; margin-left: 5px;">
+        <input type="checkbox" id="select-all-subtopics">
+        <span class="checkbox-custom"></span>
+        <span class="checkbox-text">Select All Subtopics</span>
+    </label>
+
+    <div class="checkbox-scroll-container" id="subtopics-container">
+        {% for sub_topic in sub_topics %}
+        <label class="checkbox-label" data-topic="{{ sub_topic.topic.id }}" style="display: none;">
+            <input type="checkbox" name="sub_topic[]" value="{{ sub_topic.id }}">
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">{{ sub_topic.name }}</span>
+        </label>
+        {% endfor %}
+    </div>
+</div>
+
+         
+
+                    </div>
+                
+
+                    <!-- Right Section -->
+                    <div class="right-section bordered-box">
+                        <div class="input-group">
+                            <label for="tutoring-type">Type of Tutoring</label>
+                            <select id="tutoring-type" name="tutoring_type">
+                                <option value="" disabled selected>Select tutoring type</option>
+                                <option value="online">Online Tutoring</option>
+                                <option value="in-person">In-Person Tutoring</option>
+                                <option value="both">Both Online & In-Person</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="grade">Grade Levels You Teach</label>
+                            <select id="grade" name="grade[]" multiple class="multi-select">
+                                {% for grade in grade_levels %}
+                                <option value="{{ grade.id }}">{{ grade.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                       
+
+                   <div class="input-group">
+    <label>Availability Time</label>
+    <div id="availability-container">
+        <div class="time-slot">
+            <select name="days[]" required>
+                <option value="" disabled selected>Select a day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+            </select>
+            <label class="from">From</label>
+            <input  type="time" name="start_times[]" class="start-time" required 
+            onchange="validateTime(this)">
+        
+            <label  class="to">To</label>
+            <input type="time" name="end_times[]" class="end-time" required 
+          onchange="validateTime(this)" >
+             <span class="time-error "></span>
+        </div>
+    </div>
+    <button type="button" id="add-button" class="add-button" onclick="addTimeSlot()">+</button>
+</div>
+
+                      
+                        <div class="form-footer">
+                            <button type="submit" class="save-button">Save and Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </main>
+
+
+    
+   
+
+
+    <script src="{% static 'js/user_about.js' %}"></script>
+    
+ 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
+    <script>
+
+document.querySelector('form').addEventListener('submit', function (event) {
+    const subjectChecked = document.querySelectorAll('input[name="subjects[]"]:checked').length > 0;
+    const topicChecked = document.querySelectorAll('input[name="topics[]"]:checked').length > 0;
+    const subtopicChecked = document.querySelectorAll('input[name="sub_topic[]"]:checked').length > 0;
+
+    const subjectContainer = document.getElementById('subjects-container');
+    const topicContainer = document.getElementById('topics-container');
+    const subtopicContainer = document.getElementById('subtopics-container');
+
+    const tutoringTypeSelect = document.getElementById('tutoring-type');
+    const gradeSelect = document.getElementById('grade');
+
+ 
+    subjectContainer.style.border = '';
+    topicContainer.style.border = '';
+    subtopicContainer.style.border = '';
+    tutoringTypeSelect.style.border = '';
+    gradeSelect.nextElementSibling?.classList?.remove('select-error');
+
+    let isValid = true;
+
+    if (!subjectChecked) {
+        subjectContainer.style.border = '2px solid red';
+        isValid = false;
+    }
+    if (!topicChecked) {
+        topicContainer.style.border = '2px solid red';
+        isValid = false;
+    }
+    if (!subtopicChecked) {
+        subtopicContainer.style.border = '2px solid red';
+        isValid = false;
+    }
+    if (!tutoringTypeSelect.value) {
+        tutoringTypeSelect.style.border = '2px solid red';
+        isValid = false;
+    }
+    if ([...gradeSelect.options].filter(opt => opt.selected).length === 0) {
+        gradeSelect.nextElementSibling?.classList?.add('select-error');
+        isValid = false;
+    }
+
+    if (!isValid) {
+        event.preventDefault(); 
+    }
+});
+        function restrictDays() {
+            const maxSameDayCount = 2;
+    
+            function updateDayOptions() {
+                const dayCounts = {
+                    'Monday': 0,
+                    'Tuesday': 0,
+                    'Wednesday': 0,
+                    'Thursday': 0,
+                    'Friday': 0
+                };
+    
+                const selects = document.querySelectorAll('select[name="days[]"]');
+    
+               
+                selects.forEach(select => {
+                    const val = select.value;
+                    if (val && dayCounts[val] !== undefined) {
+                        dayCounts[val]++;
+                    }
+                });
+    
+            
+                selects.forEach(select => {
+                    const currentValue = select.value;
+                    const options = select.querySelectorAll('option');
+    
+                    options.forEach(option => {
+                        if (option.value === "") {
+                            option.disabled = false; 
+                        } else if (option.value === currentValue) {
+                            option.disabled = false; 
+                        } else {
+                            option.disabled = dayCounts[option.value] >= maxSameDayCount;
+                        }
+                    });
+                });
+            }
+    
+       
+            function attachChangeListeners() {
+                const selects = document.querySelectorAll('select[name="days[]"]');
+                selects.forEach(select => {
+                    if (!select.dataset.listenerAttached) {
+                        select.addEventListener('change', updateDayOptions);
+                        select.dataset.listenerAttached = "true";
+                    }
+                });
+            }
+    
+         
+            function handleNewSlot() {
+                setTimeout(() => {
+                    attachChangeListeners();
+                    updateDayOptions();
+                }, 10);
+            }
+    
+           
+            document.getElementById('add-button').addEventListener('click', handleNewSlot);
+    
+           
+            attachChangeListeners();
+            updateDayOptions();
+        }
+    
+        document.addEventListener('DOMContentLoaded', restrictDays);
+
+        function updateSelectAllVisibility() {
+    const visibleTopics = document.querySelectorAll('#topics-container .checkbox-label:not([style*="display: none"])');
+    const visibleSubtopics = document.querySelectorAll('#subtopics-container .checkbox-label:not([style*="display: none"])');
+
+    document.getElementById('select-all-topics-wrapper').style.display = visibleTopics.length > 0 ? 'flex' : 'none';
+    document.getElementById('select-all-subtopics-wrapper').style.display = visibleSubtopics.length > 0 ? 'flex' : 'none';
+}
+
+
+
+    </script>
+    
+      
+
+
+
+  
+</body>
+</html>

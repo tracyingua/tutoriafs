@@ -1,0 +1,12 @@
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'css/warning_modal.css' %}">
+
+<div class="modal" id="fileTypeModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-header">Invalid File Type</div>
+        <div class="modal-body">Please upload a JPEG or PNG image.</div>
+    </div>
+</div>

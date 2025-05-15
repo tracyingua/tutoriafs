@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Tutoria</title>
+    <link rel="stylesheet" href="{% static 'css/signin.css' %}" />
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}" />
+  </head>
+  <body>
+    {% include 'users/header2.html' %}
+
+    <main class="create-account">
+      <div class="signup-container">
+        <div class="signup-welcome">
+          <h2>Welcome back <span class="brand-name">ADMIN</span></h2>
+          <p>Log in to manage tutors and oversee the platform.</p>
+
+          <img
+            src="{% static 'images/owl.png' %}"
+            alt="Welcome to Tutoria"
+            class="owl-icon"
+          />
+        </div>
+        <div class="signup-form">
+          <h3>Log in</h3>
+          <p>Admin access: Enter your credentials to manage the platform.</p>
+
+
+          {% if error %}
+          <div class="error-messages">
+            <h4 class="error-title">{{ error_title }}</h4>
+            <p class="error-text">{{ error_message }}</p>
+          </div>
+          {% endif %}
+
+          <form action="{% url 'adminlogin' %}" method="post">
+            {% csrf_token %}
+            <label for="email">Email or Username</label>
+            <input type="text" id="email" name="email" required />
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+
+            <button type="submit" class="btn-primary">LOGIN</button>
+          </form>
+
+         
+           
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="{% static 'js/index.js' %}"></script>
+
+   
+  </body>
+</html>

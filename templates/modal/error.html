@@ -1,0 +1,32 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/error_modal.css' %}" />
+
+<div id="errorModal" class="error-modal">
+    <div class="error-modal-content">
+      <span class="error-close-btn" onclick="closeErrorModal()">&times;</span>
+      <h2 id="error-title">{{ error_title|default:"Error!" }}</h2>
+      <p id="error-message">{{ error_message|default:"Something went wrong. Please try again." }}</p>
+      <button class="error-button" onclick="closeErrorModal()">OK</button>
+    </div>
+</div>
+
+<script>
+  function showErrorModal(title, message) {
+    document.getElementById('error-title').innerText = title;
+    document.getElementById('error-message').innerText = message;
+    document.getElementById('errorModal').style.display = 'flex';
+
+ 
+    document.documentElement.classList.add('no-scroll'); 
+    document.body.classList.add('no-scroll');
+  }
+
+  function closeErrorModal() {
+    document.getElementById('errorModal').style.display = 'none';
+
+  
+    document.documentElement.classList.remove('no-scroll');
+    document.body.classList.remove('no-scroll');
+  }
+</script>

@@ -1,0 +1,33 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/edit_parent_profile.css' %}" />
+
+<!-- Success Modal -->
+<div id="success-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'success' %}
+          <p id="modal-message">{{ message }}</p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    <button class="close-modal" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script src="{% static 'js/edit_parent_profile.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var modal = document.getElementById("success-modal");
+    var messageText = document.getElementById("modal-message");
+
+    if (messageText && messageText.innerText.trim() !== "") {
+        modal.style.display = "block";
+    }
+  });
+
+  function closeModal() {
+    document.getElementById("success-modal").style.display = "none";
+  }
+</script>

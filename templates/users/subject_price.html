@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price per Subject</title>
+    <link rel="stylesheet" href="{% static 'css/subject_price.css' %}">
+</head>
+<body>
+
+    <!-- Header (Included) -->
+    {% include 'users/header2.html' %}
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+        <div class="container">
+            <h2>Price per Subject</h2>
+            <p>Please place the corresponding price on the selected subject accurately</p>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for subject in subjects %}
+                    <label for="subject_{{ subject.id }}">{{ subject.name }}</label>
+                    <input
+                    type="number"
+                    id="subject_{{ subject.id }}"
+                    name="subject_price[]"
+                    placeholder="PHP"
+                    min="0"
+                    oninput="this.value = Math.abs(this.value)"
+                >
+                
+                {% endfor %}
+
+                <button class="continue" type="submit"> CONTINUE</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const labels = document.querySelectorAll("label[for^='subject_']");
+      labels.forEach(label => {
+        label.textContent = label.textContent.replace(/\s*\([^)]*\)/g, '');
+      });
+    });
+  </script>
+  

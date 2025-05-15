@@ -1,0 +1,113 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register a Student</title>
+    <link rel="stylesheet" href="{% static 'css/register_student.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+</head>
+
+<style>
+    .suggested-note {
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+</style>
+{% include 'users/navigation.html' %}
+
+<body>
+
+    <div class="register-container">
+        <div class="register-card">
+
+            <section class="back-button-wrapper">
+                <button class="back-button" onclick="goBack()">
+                  <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </section>
+
+
+
+            <h2>Register a Student</h2>
+
+        
+  
+            <div id="photo-warning" class="warning-message" style="display: none;">
+                <p>Please upload a profile photo.</p>
+            </div>
+
+
+
+            <form method="post" enctype="multipart/form-data" class="register-form">
+         
+
+            <div class="profile-card">
+                <img src="{% static 'images/svg/user.svg' %}" alt="Profile Image" class="profile-photo" id="profile-preview">
+                <label for="id_profile_photo" class="custom-file-upload">
+                    <i class="fa fa-upload"></i> Choose a Photo
+                </label>
+                {{ form.profile_photo }}
+            </div>
+
+        
+                {% csrf_token %}
+                
+                <label for="id_profile_name"  >First Name </label>
+                {{ form.first_name }}
+
+
+                <label for="id_profile_name">Middle Name</label>
+                {{ form.middle_name }}
+
+
+                <label for="id_profile_name">Last Name</label>
+                {{ form.last_name }}
+
+                <label for="id_gender">Gender</label>
+                {{ form.gender }}
+
+                
+                <label for="id_birthday">Birthday</label>
+                {{ form.birthday }}
+
+                <label for="id_grade_level">Grade Level</label>
+                {{ form.grade_level }}
+
+                <label for="id_street">Street</label>   <small class="suggested-note">Suggested from your profile</small>
+                {{ form.street }}
+                {% if form.initial.street %}
+                  
+                {% endif %}
+                
+                <label for="id_barangay">Barangay</label>     <small class="suggested-note">Suggested from your profile</small>
+                {{ form.barangay }}
+                {% if form.initial.barangay %}
+                 
+                {% endif %}
+                
+                <button type="submit" class="save-btn">Continue</button>
+            </form>
+        </div>
+
+        {% include 'modal/register_student.html' %}
+    </div>
+
+    
+
+    <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/register_student.js' %}"></script>
+    <script>
+        var goBackUrl = "{% url 'parent_profile' %}";
+
+
+        
+    </script>
+</body>
+</html>

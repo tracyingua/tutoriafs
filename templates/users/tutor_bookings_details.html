@@ -1,0 +1,816 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details - {{ student.first_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/tutor_bookings_details.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <style>
+        .status-pending {
+  background-color: rgba(248, 150, 30, 0.1) !important;
+  color: var(--warning-color) !important;
+  border: 1px solid rgba(248, 150, 30, 0.3) !important;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+
+   
+}
+
+
+    </style>
+
+ 
+    
+
+  
+    {% include 'users/navigation.html' %}
+
+    <main class="container">
+
+        <a href="{% url 'tutor_bookings' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Bookings
+        </a>
+        <!-- Header Section -->
+        <div class="header-section">
+          
+          
+        </div>
+
+        <!-- Student Profile -->
+        <div class="student-profile">
+            <div class="profile-image-container">
+                {% if student.profile_photo %}
+                    <img src="{{ student.profile_photo.url }}" alt="Student Photo" class="profile-image">
+                {% else %}
+                    <img src="{% static 'images/default-profile.png' %}" alt="Default Photo" class="profile-image">
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <div class="info-item">
+                    <span class="info-label">Name:</span>
+                    <span>{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Grade:</span>
+                    <span>{{ student.grade_level }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Gender:</span>
+                    <span>{{ student.gender | title }}</span>
+                </div>
+            </div>
+            <div class="guardian-info">
+                <div class="info-item">
+                    <span class="info-label">Address:</span>
+                    <span>{{ student.street }}, {{ student.barangay }}, {{ student.city }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Parent/Guardian:</span>
+                    <span>{{ parent_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Parent Contact #:</span>
+                    <span>{{ parent_contact }}</span>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="card-icon">
+                    <i class="fas fa-list-ol"></i>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ total_sessions }}</span>
+                    <span class="card-label">Total Sessions</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ total_duration }} hrs</span>
+                    <span class="card-label">Total Duration</span>
+                </div>
+            </div>
+            
+            <div class="summary-card completed">
+                <div class="card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ completed_hours }} hrs</span>
+                    <span class="card-label">Completed</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">₱{{ total_amount|floatformat:2 }}</span>
+                    <span class="card-label">Total Amount</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">₱{{ paid_amount|floatformat:2 }}</span>
+                    <span class="card-label">Paid</span>
+                </div>
+            </div>
+            
+            <div class="summary-card {% if balance_due > 0 %}balance-due{% endif %}">
+                <div class="card-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">₱{{ balance_due|floatformat:2 }}</span>
+                    <span class="card-label">Balance Due</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3><i class="fas fa-filter"></i> Filter Sessions</h3>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="declined">Declined</option>
+                        <option value="canceled">Canceled</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Table -->
+        {% if bookings %}
+        <div class="booking-table-container">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Tutor/Substitute</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr data-status="{{ booking.status|lower }}" 
+                        data-subject="{{ booking.subject.name }}"
+                        data-month="{{ booking.date|date:'n' }}">
+                        
+                        <td>{{ booking.subject.name }}</td>
+                        <td>{{ booking.date|date:"M d, Y" }}</td>
+                        <td>{{ booking.day_of_week }}</td>
+                        <td>{{ booking.display_start_time }}</td>
+                        <td>{{ booking.display_end_time }}</td>
+                        <td>{{ booking.duration }} hr</td>
+            
+                        <td>
+                            {% if booking.status == "canceled_by_tutor" or booking.status == "cancelled_by_tutor" %}
+                                <span class="status-badge status-canceled">Cancelled by Tutor</span>
+                            {% elif booking.status == "canceled_by_parent" or booking.status == "cancelled_by_parent" %}
+                                <span class="status-badge status-canceled">Cancelled by Parent</span>
+                            {% elif booking.status == "in_progress" %}
+                                <span class="status-badge status-confirmed">In Progress</span>
+                            {% elif booking.status == "pending" %}
+                                <span class="status-badge status-pending">Pending</span>
+                            {% elif booking.status == "completed" %}
+                                <span class="status-badge status-completed">Completed</span>
+                            {% elif booking.status == "confirmed" %}
+                                <span class="status-badge status-confirmed">Confirmed</span>
+                            {% elif booking.status == "declined" %}
+                                <span class="status-badge status-declined">Declined</span>
+                            {% else %}
+                                <span class="status-badge">{{ booking.status | title }}</span>
+                            {% endif %}
+                        </td>
+            
+                        <td>
+                            {% if booking.is_substitute %}
+                                <div class="substitute-info">
+                                    <strong>Substitute:</strong> {{ booking.substitute_name }}<br>
+                                    <small>
+                                        {% if booking.substitute_contact %}
+                                            {{ booking.substitute_contact }}<br>
+                                        {% endif %}
+                                        {% if booking.substitute_street or booking.substitute_barangay %}
+                                            {{ booking.substitute_street }}{% if booking.substitute_street and booking.substitute_barangay %}, {% endif %}
+                                            {{ booking.substitute_barangay }}, Zamboanga
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            {% else %}
+                                <div class="primary-tutor">
+                                    {{ booking.tutor_schedule.tutor.user.get_full_name }}
+                                </div>
+                            {% endif %}
+                        </td>
+            
+                        <td>
+                            {% if booking.tutor_schedule.status == 'confirmed' %}
+                                <div class="action-buttons">
+                                    {% if booking.status == "pending" %}
+                                        <button class="btn-action btn-accept accept-btn" data-booking-id="{{ booking.id }}">
+                                            <i class="fas fa-check"></i> Accept
+                                        </button>
+                                        <button class="btn-action btn-decline decline-btn" data-booking-id="{{ booking.id }}">
+                                            <i class="fas fa-times"></i> Decline
+                                        </button>
+                        
+                                    {% elif booking.status == "confirmed" %}
+                                        <button class="btn-action btn-complete complete-btn" data-booking-id="{{ booking.id }}">
+                                            <i class="fas fa-check-double"></i> Complete
+                                        </button>
+                                        <button class="btn-action btn-cancel cancel-btn" data-booking-id="{{ booking.id }}">
+                                            <i class="fas fa-ban"></i> Cancel
+                                        </button>
+                                        {% if not booking.is_substitute %}
+                                            <button class="btn-action btn-substitute" data-booking-id="{{ booking.id }}">
+                                                <i class="fas fa-user-clock"></i> Substitute
+                                            </button>
+                                        {% endif %}
+                        
+                                    {% elif booking.status == "canceled_by_tutor" or booking.status == "cancelled_by_tutor" %}
+                                        <span class="status-reason">
+                                            Reason: {{ booking.cancellation_reason|default:"No reason provided" }}
+                                        </span>
+                                    {% elif booking.status == "canceled_by_parent" or booking.status == "cancelled_by_parent" %}
+                                        <span class="status-reason">
+                                            Reason: {{ booking.cancellation_reason|default:"No reason provided" }}
+                                        </span>
+                                    {% else %}
+                                        <span class="no-action">No actions available</span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="schedule-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Schedule not confirmed
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            
+            
+
+            <!-- Pagination -->
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="page-link first-page" title="First Page">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link prev-page" title="Previous Page">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="page-link current-page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-link next-page" title="Next Page">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link last-page" title="Last Page">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="no-sessions">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No Sessions Found</h3>
+            <p>This student doesn't have any booked sessions yet.</p>
+        </div>
+        {% endif %}
+
+        <!-- Modals -->
+        <div id="acceptModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3><i class="fas fa-check-circle"></i> Accept Booking</h3>
+                <p>Confirm the session details before accepting:</p>
+                <form id="acceptForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="bookingId" name="booking_id">
+                    <div class="form-group">
+                        <label for="sessionTime">Session Start Time:</label>
+                        <input type="time" id="sessionTime" name="start_time" required class="form-input">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-confirm">Confirm </button>
+                        <button type="button" class="btn btn-cancel close-modal">Cancel</button>
+                       
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="declineModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3><i class="fas fa-times-circle"></i> Decline Booking</h3>
+                <p>Are you sure you want to decline this booking request?</p>
+                <form id="declineForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="declineBookingId" name="booking_id">
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-decline">Confirm </button>
+                        <button type="button" class="btn btn-cancel close-modal">Cancel</button>
+                       
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="completeModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3><i class="fas fa-check-double"></i> Complete Session</h3>
+                <p>Mark this session as completed? Please confirm:</p>
+                <ul class="modal-checklist">
+                    <li><i class="fas fa-check"></i> Session was conducted</li>
+                    <li><i class="fas fa-check"></i> Payment was received</li>
+                   
+                </ul>
+                <form id="completeForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="completeBookingId" name="booking_id">
+                    <div class="form-group" style="display: none;">
+                        <label for="sessionNotes">Session Notes (optional):</label>
+                        <textarea id="sessionNotes" name="notes" class="form-input" rows="3"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-confirm">Mark as Completed</button>
+                        <button type="button" class="btn btn-cancel close-modal">Cancel</button>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- Substitute Tutor Modal -->
+<div id="substituteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3><i class="fas fa-user-clock"></i>  Substitute Tutor</h3>
+        <form id="substituteForm">
+            {% csrf_token %}
+            <input type="hidden" id="substituteBookingId" name="booking_id">
+            
+            <div class="form-group">
+                <label for="substituteName">Substitute Name *</label>
+                <input type="text" id="substituteName" name="substitute_name" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="substituteContact">Contact Number *</label>
+                <input type="tel" id="substituteContact" name="substitute_contact" class="form-input" required
+                       pattern="[0-9]{11}" title="11-digit phone number (e.g., 09123456789)">
+                <small  style="display: none;" class="text-muted">Format: 09123456789</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="substituteStreet">Street Address</label>
+                <input type="text" id="substituteStreet" name="substitute_street" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="substituteBarangay">Barangay</label>
+                <input type="text" id="substituteBarangay" name="substitute_barangay" class="form-input">
+                <small style="display: none;" class="text-muted">City: Zamboanga</small>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-confirm">Confirm</button>
+                <button type="button" class="btn btn-cancel close-modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+        
+
+        <div id="cancelModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3><i class="fas fa-ban"></i> Cancel Session</h3>
+                <p>Are you sure you want to cancel this session?</p>
+                <form id="cancelForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="cancelBookingId" name="booking_id">
+                    <div class="form-group">
+                        <label for="cancelReason">Reason for cancellation:</label>
+                        <select id="cancelReason" name="reason" class="form-input" required>
+                            <option value="">Select a reason</option>
+                            <option value="schedule_conflict">Schedule conflict</option>
+                            <option value="student_request">Student request</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="otherReasonGroup" style="display:none;">
+                        <label for="otherReason">Please specify:</label>
+                        <input type="text" id="otherReason" name="other_reason" class="form-input">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-cancel close-modal">Go Back</button>
+                        <button type="submit" class="btn btn-decline">Confirm Cancellation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="messageTitle"><i class="fas fa-info-circle"></i> Message</h3>
+                <p id="messageContent">Operation completed successfully.</p>
+                <div class="modal-actions">
+                    <button id="messageClose" class="btn btn-confirm">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if bookings.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ bookings.previous_page_number }}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ bookings.number }} of {{ bookings.paginator.num_pages }}.
+                </span>
+        
+                {% if bookings.has_next %}
+                    <a href="?page={{ bookings.next_page_number }}">next</a>
+                    <a href="?page={{ bookings.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </main>
+
+<script>
+    $(document).ready(function () {
+    // Modal elements
+    var acceptModal = $("#acceptModal");
+    var declineModal = $("#declineModal");
+    var completeModal = $("#completeModal");
+    var cancelModal = $("#cancelModal");
+    var messageModal = $("#messageModal");
+
+    // Show reason field when "Other" is selected
+    $("#cancelReason").change(function () {
+        if ($(this).val() === "other") {
+            $("#otherReasonGroup").show();
+        } else {
+            $("#otherReasonGroup").hide();
+        }
+    });
+
+    // Show message function
+    function showMessage(title, content, isError = false, reload = false) {
+        $("#messageTitle").html(
+            `<i class="fas ${isError ? "fa-exclamation-triangle" : "fa-check-circle"}"></i> ${title}`
+        );
+        $("#messageContent").text(content);
+        $("#messageTitle").css("color", isError ? "#f94144" : "#4361ee");
+
+        messageModal.css("display", "flex"); 
+
+        $("#messageClose").off("click").on("click", function () {
+            messageModal.hide();
+            if (reload) {
+                location.reload();
+            }
+        });
+    }
+
+    // Close modal when clicking outside
+    $(window).click(function (event) {
+        if ($(event.target).hasClass("modal")) {
+            acceptModal.hide();
+            declineModal.hide();
+            completeModal.hide();
+            cancelModal.hide();
+            messageModal.hide();
+        }
+    });
+
+    // Button handlers
+    $(".accept-btn").click(function () {
+        var bookingId = $(this).data("booking-id");
+        $("#bookingId").val(bookingId);
+        acceptModal.css("display", "flex");
+    });
+
+    $(".decline-btn").click(function () {
+        var bookingId = $(this).data("booking-id");
+        $("#declineBookingId").val(bookingId);
+        declineModal.css("display", "flex");
+    });
+
+    $(".complete-btn").click(function () {
+        var bookingId = $(this).data("booking-id");
+        $("#completeBookingId").val(bookingId);
+        completeModal.css("display", "flex");
+    });
+
+    $(".cancel-btn").click(function () {
+        var bookingId = $(this).data("booking-id");
+        $("#cancelBookingId").val(bookingId);
+        cancelModal.css("display", "flex");
+    });
+
+    // Close buttons
+    $(".close, .close-modal").click(function () {
+        acceptModal.hide();
+        declineModal.hide();
+        completeModal.hide();
+        cancelModal.hide();
+        messageModal.hide();
+    });
+
+
+    // Add substitute modal to your modal elements list
+var substituteModal = $("#substituteModal");
+
+// Button handler for substitute button
+$(".btn-substitute").click(function() {
+    var bookingId = $(this).data("booking-id");
+    $("#substituteBookingId").val(bookingId);
+    substituteModal.css("display", "flex");
+});
+
+// Add substituteModal to the window click handler
+$(window).click(function (event) {
+    if ($(event.target).hasClass("modal")) {
+        acceptModal.hide();
+        declineModal.hide();
+        completeModal.hide();
+        cancelModal.hide();
+        substituteModal.hide();
+        messageModal.hide();
+    }
+});
+
+// Form submission for substitute
+$("#substituteForm").submit(function(e) {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!$("#substituteName").val()) {
+        showMessage("Error", "Please enter substitute name", true);
+        return;
+    }
+    
+    if (!$("#substituteContact").val()) {
+        showMessage("Error", "Please enter contact number", true);
+        return;
+    }
+    
+    var formData = $(this).serialize();
+    
+    $.ajax({
+        type: "POST",
+        url: "{% url 'assign_substitute' %}",
+        data: formData,
+        success: function(response) {
+            if (response.success) {
+                substituteModal.hide();
+                showMessage(
+                    "Success", 
+                    response.message, 
+                    false, 
+                    true  // Reload the page
+                );
+            } else {
+                showMessage("Error", response.error, true);
+            }
+        },
+        error: function(xhr) {
+            showMessage(
+                "Error", 
+                xhr.responseJSON.error || "An error occurred while assigning substitute", 
+                true
+            );
+        }
+    });
+});
+
+    // Filter functionality
+    function filterBookings() {
+        var status = $("#statusFilter").val().toLowerCase();
+        var subject = $("#subjectFilter").val();
+        var month = $("#monthFilter").val();
+
+        $("tbody tr").each(function () {
+            var $row = $(this);
+            var rowStatus = $row.data("status");
+            var rowSubject = $row.data("subject");
+            var rowMonth = $row.data("month");
+
+            var statusMatch = status === "" || rowStatus === status;
+            var subjectMatch = subject === "" || rowSubject === subject;
+            var monthMatch = month === "" || rowMonth.toString() === month;
+
+            if (statusMatch && subjectMatch && monthMatch) {
+                $row.show();
+            } else {
+                $row.hide();
+            }
+        });
+    }
+
+
+    $(".filter-select").change(filterBookings);
+
+
+    $("#resetFilters").click(function () {
+        $(".filter-select").val("");
+        filterBookings();
+    });
+
+   
+    $("#acceptForm").submit(function (e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'accept_booking' %}",
+            data: formData,
+            success: function (response) {
+                if (response.success) {
+                    acceptModal.hide();
+                    showMessage("Success", "Booking accepted successfully!", false, true);
+                } else {
+                    showMessage("Error", response.error, true);
+                }
+            },
+            error: function (xhr) {
+                showMessage("Error", xhr.responseJSON.error || "An error occurred while accepting the booking", true);
+            }
+        });
+    });
+
+    $("#declineForm").submit(function (e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'decline_booking' %}",
+            data: formData,
+            success: function (response) {
+                if (response.success) {
+                    declineModal.hide();
+                    showMessage("Success", "Booking declined successfully!", false, true);
+                } else {
+                    showMessage("Error", response.error, true);
+                }
+            },
+            error: function (xhr) {
+                showMessage("Error", xhr.responseJSON.error || "An error occurred while declining the booking", true);
+            }
+        });
+    });
+
+    $("#completeForm").submit(function (e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'complete_booking' %}",
+            data: formData,
+            success: function (response) {
+                if (response.success) {
+                    completeModal.hide();
+                    showMessage("Success", "Session marked as completed!", false, true);
+                } else {
+                    showMessage("Error", response.error, true);
+                }
+            },
+            error: function (xhr) {
+                showMessage("Error", xhr.responseJSON.error || "An error occurred while completing the session", true);
+            }
+        });
+    });
+
+    $("#cancelForm").submit(function(e) {
+e.preventDefault();
+var formData = $(this).serialize();
+
+var reason = $("#cancelReason").val();
+if (!reason) {
+showMessage("Error", "Please select a cancellation reason", true);
+return;
+}
+
+if (reason === "other" && !$("#otherReason").val()) {
+showMessage("Error", "Please specify the cancellation reason", true);
+return;
+}
+
+$.ajax({
+type: "POST",
+url: "{% url 'cancel_booking' %}",
+data: formData,
+success: function(response) {
+    if (response.success) {
+        cancelModal.hide();
+        showMessage(
+            "Success", 
+            `Session cancelled successfully. Reason: ${response.reason}`, 
+            false, 
+            true
+        );
+    } else {
+        showMessage("Error", response.error, true);
+    }
+},
+error: function(xhr) {
+    showMessage(
+        "Error", 
+        xhr.responseJSON.error || "An error occurred while cancelling the session", 
+        true
+    );
+}
+});
+});
+});
+document.addEventListener('DOMContentLoaded', function () {
+        const substituteModal = document.getElementById('substituteModal');
+        const closeBtn = substituteModal.querySelector('.close');
+        const cancelBtn = substituteModal.querySelector('.close-modal');
+
+        // Close modal on "×" button click
+        closeBtn.addEventListener('click', function () {
+            substituteModal.style.display = 'none';
+        });
+
+        // Close modal on "Cancel" button click
+        cancelBtn.addEventListener('click', function () {
+            substituteModal.style.display = 'none';
+        });
+
+        // Optional: Close modal when clicking outside the modal content
+        window.addEventListener('click', function (event) {
+            if (event.target === substituteModal) {
+                substituteModal.style.display = 'none';
+            }
+        });
+    });
+
+
+
+
+</script>
+</body>
+</html>

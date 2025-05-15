@@ -1,0 +1,76 @@
+
+.modal-open .admin-container {
+    filter: blur(5px);
+    pointer-events: none; 
+}
+
+.message-modal-open .admin-container{
+
+    filter: blur(5px);
+    pointer-events: none; 
+
+}
+
+.message-modal {
+    filter: none;
+    display: none;
+    pointer-events: auto;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    text-align: center;
+}
+
+
+
+.modal {
+    filter: none;
+    display: none;
+    pointer-events: auto;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    text-align: center;
+}
+
+
+.modal-content {
+    font-size: 18px;
+}
+
+.modal-buttons {
+    margin-top: 15px;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 12px 25px; 
+    border: none;
+    cursor: pointer;
+    margin: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.confirm-btn {
+    background: #ff7277;
+    font-weight: bold;
+    color: black;
+}
+
+.cancel-btn {
+    background: #929292;
+    font-weight: bold;
+    color: black;
+}

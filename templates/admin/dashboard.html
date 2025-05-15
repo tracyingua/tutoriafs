@@ -1,0 +1,175 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="icon" href="{% static 'images/owl.png' %}">
+</head>
+
+<body>
+    {% include 'admin/sidebar.html' %}
+  
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1>Dashboard Overview</h1>
+                <p class="welcome-message">Welcome back, Admin!</p>
+            </div>
+            <div class="header-right">
+                <div class="date-display">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="current-date"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="statistics-grid">
+      
+            <div class="stat-card tutor-card">
+                <div  style="background-color: #2980b9;" class="stat-icon">
+                    <i  class="fas fa-chalkboard-user"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Tutors</h3>
+                    <div style="color: #2980b9;" class="stat-value">{{ tutor_count }}</div>
+                    <div class="stat-details">
+                      
+                        <span class="detail-value">{{ active_tutor_count }}</span>
+                    </div>
+                </div>
+                <div class="card-decoration"></div>
+            </div>
+            
+           
+            <div class="stat-card parent-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Parents</h3>
+                    <div class="stat-value">{{ parent_count }}</div>
+                    <div class="stat-details">
+                     
+                        <span class="detail-value">{{ active_parent_count }}</span>
+                    </div>
+                </div>
+                <div class="card-decoration"></div>
+            </div>
+            
+     
+            <div class="stat-card student-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Students</h3>
+                    <div class="stat-value">{{ student_count }}</div>
+                    <div class="stat-details">
+                  
+                        <span class="detail-value">{{ active_student_count }}</span>
+                    </div>
+                </div>
+                <div class="card-decoration"></div>
+            </div>
+            
+          
+            <div class="stat-card session-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Sessions</h3>
+                    <div class="stat-value">{{ total_sessions }}</div>
+                    <div class="stat-details">
+                    
+                    </div>
+                </div>
+                <div class="card-decoration"></div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="top-tutors-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-crown"></i> Top Tutors</h2>
+                    <p>Tutors with most scheduled sessions</p>
+                </div>
+                <div class="tutors-grid">
+                    {% for tutor in top_tutors %}
+                    <div class="tutor-card">
+                        <div class="tutor-header">
+                            {% if tutor.profile_photo %}
+                                <img src="{{ tutor.profile_photo.url }}" alt="{{ tutor.user.username }}" class="tutor-avatar">
+                            {% else %}
+                                <div class="tutor-avatar default-avatar">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                            {% endif %}
+                            <div class="tutor-info">
+                                <h3>{{ tutor.user.get_full_name|default:tutor.user.username }}</h3>
+                                <div class="tutor-rating">
+                                    {% with tutor.avg_rating|default:0 as rating %}
+                                        {% if tutor.review_count > 0 %}
+                                            {% for i in "12345" %}
+                                                <i class="fas fa-star{% if forloop.counter > rating %}-o{% endif %}"></i>
+                                            {% endfor %}
+                                            <span>({{ tutor.review_count }} reviews)</span>
+                                        {% else %}
+                                            <span class="no-reviews">No reviews yet</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tutor-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Total Schedules:</span>
+                                <strong>{{ tutor.total_schedules }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Confirmed:</span>
+                                <strong>{{ tutor.confirmed_schedules }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Total Sessions:</span>
+                                <strong>{{ tutor.total_sessions }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-check-double"></i>
+                                <span>Completed:</span>
+                                <strong>{{ tutor.completed_sessions }}</strong>
+                            </div>
+                        </div>
+                        <div class="tutor-contact">
+                            <span><i class="fas fa-phone-alt"></i> {{ tutor.user.phone_number|default:"Not provided" }}</span>
+                            <span><i class="fas fa-envelope"></i> {{ tutor.user.email }}</span>
+                        </div>
+                       
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+          
+
+    <script>
+
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+        
+   
+        document.querySelectorAll('.activity-item').forEach((item, index) => {
+            item.style.animation = `fadeIn 0.3s ease forwards ${index * 0.1}s`;
+        });
+    </script>
+</body>
+</html>

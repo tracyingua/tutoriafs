@@ -1,0 +1,280 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutor-Profile</title>
+    <link rel="stylesheet" href="{% static 'css/teacher_profile.css' %}" />
+    <link rel="icon" type="image/png" href="{% static 'images/owl.png' %}"/>
+  </head>
+  <style>
+
+.profile-right {
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.teaching-info p,
+.profile-info-grid li {
+  margin: 8px 0;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 30px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.availability-container {
+  margin-top: 5px;
+}
+
+.availability-day {
+  font-weight: bold;
+  display: inline-block;
+}
+
+.view-more-btn {
+  margin-top: 5px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.expertise {
+  margin-top: 10px;
+}
+
+.star-icon.filled {
+  fill: #FFD700; /* gold */
+}
+
+
+
+  </style>
+
+ 
+
+  {% include 'users/navigation.html' %}
+  <body>
+
+    <div class="profile-container">
+        <div class="profile-left">
+            <h2 class="profile-title">Tutor Profile</h2>
+            <div class="profile-image">
+              <img src="{{ tutor.profile_photo.url }}" alt="Tutor Profile" />
+
+            </div>
+            <div class="profile-details">
+              <h3 class="tutor-name">{{ tutor.user.get_full_name | title }}</h3>
+              <p class="tutor-email">
+                  <img src="{% static 'images/svg/envelope.svg' %}" alt="Email Icon">
+                  <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ tutor.user.email }}" target="_blank">
+                    {{ tutor.user.email }}
+                </a>
+                
+              </p>
+          </div>
+          
+            <p class="profile-desc">
+           
+            </p>
+        
+            <hr class="profile-divider">
+        
+            <div class="profile-buttons">
+      
+              <button class="schedule-btn">Schedule </button>
+              <a href="{% url 'teacher_profile_2' tutor.id %}" class="next-btn">Next</a>
+
+        
+            </div>
+        </div>
+        
+
+      <div class="profile-right">
+
+      
+
+     
+
+        <div class="teaching-info">
+          <p><strong>TEACHES:</strong> 
+            {% for subject in tutor.subjects.all %}
+              {{ subject.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </p>   
+          <p>
+            <strong>
+              {% with tutor.average_rating as rating %}
+                {% with rating|floatformat:"1" as precise_rating %}
+                  {% with precise_rating|add:"-0"|slice:"-2"|floatformat:"0" as decimal %}
+                    {% with rating|floatformat:"0" as whole_rating %}
+                      
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= whole_rating|add:"0" %}
+                          <img src="{% static 'images/svg/filled.svg' %}" alt="Filled Star" width="24" height="24">
+                        
+                        {% elif forloop.counter == whole_rating|add:"1" and precise_rating|floatformat:1|slice:"-1" >= "5" %}
+                          <img src="{% static 'images/svg/half.svg' %}" alt="Half Star" width="24" height="24">
+                        
+                        {% else %}
+                          <img src="{% static 'images/svg/star.svg' %}" alt="Hollow Star" width="24" height="24">
+                        {% endif %}
+                      {% endfor %}
+                      
+                    {% endwith %}
+                  {% endwith %}
+                {% endwith %}
+              {% endwith %}
+            </strong>
+          
+            <section style="margin-left: 150px; margin-top: -32px;">
+              Overall Rating: {{ tutor.average_rating|floatformat:1 }} <span>({{ tutor.reviews.count }} reviews)</span>
+            </section>
+          </p>
+          
+          
+          
+          
+          
+          
+        
+        
+          <ul class="profile-info-grid">
+            <li>
+              <i style="font-size: 20px;" class="fas fa-chalkboard-user"></i>
+                Tutoring Mode:
+                {% if tutor.tutoring_type == "online" %}
+                    Online
+                {% elif tutor.tutoring_type == "in-person" %}
+                    In-Person
+                {% else %}
+                    Online and In-Person
+                {% endif %}
+                
+           
+                
+            </li>
+           
+            <li>
+              <img src="{% static 'images/svg/calendar.svg' %}" alt="Calendar Icon">
+              <strong>Availability:</strong>
+              <div class="availability-container">
+              
+                {% if availability_times %}
+                  <div class="availability-item">
+                    <span class="availability-day" style="margin-top: 20px;">
+                      {{ availability_times.0.day }}
+                    </span>
+                    <span class="availability-time">
+                      {{ availability_times.0.start_time|time:"g:i A" }} - {{ availability_times.0.end_time|time:"g:i A" }}
+                    </span>
+                  </div>
+                {% endif %}
+              
+                {% if availability_times|length > 1 %}
+                  <button class="view-more-btn" onclick="toggleAvailability()">View More</button>
+              
+                  <div id="extra-availability" style="display: none;">
+                    {% for availability in availability_times|slice:"1:" %}
+                      <div class="availability-item">
+                        <span class="availability-day">{{ availability.day }}</span>
+                        <span class="availability-time">
+                          {{ availability.start_time|time:"g:i A" }} - {{ availability.end_time|time:"g:i A" }}
+                        </span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+          
+          <li>
+            <img src="{% static 'images/svg/phone.svg' %}" alt="Phone Icon">
+            {% if phone_number %}
+        {{ phone_number }}
+    {% else %}
+        Not Available
+    {% endif %}
+        </li>
+        
+            <li>
+                <img src="{% static 'images/svg/chart.svg' %}" alt="Gcash Icon">
+
+                Grade level:
+            
+                  {% if tutor_grade_levels %}
+                      {{ tutor_grade_levels|join:", " }}
+                  {% else %}
+                      Not specified
+                  {% endif %}
+              </p>
+            </li>
+           
+            
+        </ul>
+        
+            
+            
+
+        <div class="expertise">
+          <h3>Subject Expertise and Progress - Minimum 100 Hours</h3>
+          
+          {% for subject in subjects_progress %}
+              <div class="progress-bar">
+                  <span style="font-weight: bold; font-size: 18px;">{{ subject.subject }} - P{{ subject.price }}/per hour</span>
+                  <div class="progress">
+                    <div class="fill" data-progress="{{ subject.progress }}"></div>
+
+
+                  </div>
+                  <span>{{ subject.progress }}%</span>
+              </div>
+          {% empty %}
+              <p>No subjects listed.</p>
+          {% endfor %}
+      </div>
+      
+      
+       
+         
+
+          
+         
+       {% include 'modal/sch_suc.html' %}
+        
+        {% include 'modal/schedule.html' %}
+        
+      
+      </div>
+
+      
+      
+    </div>
+
+
+    
+
+    
+    <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/schedule.js' %}"></script>
+  
+
+
+
+
+
+    
+   
+  </body>
+</html>

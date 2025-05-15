@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Tutor Assessment Questions</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 30px;">
+
+    <h2 style="text-align: center;">Add Tutor Assessment Questions</h2>
+
+    <form method="post">
+        {% csrf_token %}
+    
+        <label for="question">Question:</label>
+        {{ question_form.question_text }}
+    
+        <h3>Answer Choices:</h3>
+        {% for form in answer_forms %}
+            <div>
+                {{ form.text.label_tag }}
+                {{ form.text }}
+                {{ form.errors.text }}
+            </div>
+        {% endfor %}
+    
+        <button type="submit">Submit</button>
+    </form>
+    
+    
+    <script>
+        let questionCount = 1;
+    
+        function addQuestion() {
+            let container = document.getElementById("questions-container");
+            let questionHtml = `
+                <div class="question-block">
+                    <label>Question:</label>
+                    <input type="text" name="questions[]" required>
+    
+                    <div class="choices-container">
+                        <label>Choices:</label>
+                        <input type="text" name="choices[${questionCount}][]" placeholder="Choice 1" required>
+                        <input type="text" name="choices[${questionCount}][]" placeholder="Choice 2" required>
+                        <input type="text" name="choices[${questionCount}][]" placeholder="Choice 3" required>
+                        <input type="text" name="choices[${questionCount}][]" placeholder="Choice 4" required>
+                    </div>
+                </div>
+            `;
+    
+            container.insertAdjacentHTML("beforeend", questionHtml);
+            questionCount++;
+        }
+    </script>
+    
+
+</body>
+</html>

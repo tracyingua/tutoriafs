@@ -1,0 +1,505 @@
+*{
+
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none!important;
+  }
+
+.profile-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.profile-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.profile-image img {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.profile-info-grid li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.profile-info-grid img {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.profile-container {
+    align-items: stretch; 
+}
+
+.profile-left {
+    flex: 1;
+    text-align: center;
+    padding-right: 30px;
+    border-right: 2px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+}
+.profile-desc {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #555;
+    flex-grow: 1;
+}
+
+.profile-buttons {
+    display: flex;
+    justify-content: center;
+    gap:20px;
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+
+
+.profile-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;
+    margin: 30px 0;
+    border: none;
+}
+
+
+.schedule-btn,
+.next-btn {
+    width: 160px; /* Adjust based on your design */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.hour-buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.hour-btn {
+    padding: 8px 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hour-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.hour-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.time-slots-container {
+    margin-top: 15px;
+}
+.message-btn {
+    background-color: #5aa9ff;
+    color: #000000;
+}
+
+.message-btn:hover {
+    background-color: #4294e3;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.schedule-btn {
+    background-color: #5aa9ff;
+    color: #000000;
+}
+
+.next-btn {
+    background-color: #5aa9ff;
+    color: #000000;
+}
+
+.next-btn:hover {
+    background-color: #4294e3;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+
+.schedule-btn:hover {
+    background-color: #5aa9ff;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.profile-right {
+    position: relative;
+    flex: 2;
+    padding-left: 40px;
+}
+
+.teaching-info {
+    background-color: #f4f4f4;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.teaching-info p {
+    margin: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.teaching-info ul {
+    list-style: none;
+    padding: 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.teaching-info ul li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.expertise {
+    background-color: #f4f4f4;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.expertise h3 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    background: #c4c5c6; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px; 
+    padding: 15px; 
+    margin-bottom: 20px;
+    width: 100%; 
+}
+
+.progress-bar span {
+    
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-top: 10px;
+    margin-bottom:10px;
+}
+
+.progress {
+    background: #ddd; 
+    border-radius: 10px; 
+    overflow: hidden; 
+    height: 20px;
+    width: 100%;
+    position: relative;
+    border: 1px solid#494949;
+}
+
+
+.credentials {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.credential-card {
+    background: #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.profile-details {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.tutor-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #222;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.tutor-email {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+    background: #f7f7f7;
+    padding: 8px 15px;
+    border-radius: 8px;
+    width: fit-content;
+    margin: auto;
+    transition: all 0.3s ease;
+}
+
+.availability-container {
+    max-height: 150px;
+    overflow-y: auto;
+}
+.availability-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#extra-availability {
+    display: none;
+    background: white;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    z-index: 10;
+    margin-top: 8px; 
+}
+
+#extra-availability .availability-item {
+    padding: 6px 0;  
+    border-bottom: 1px solid #e0e0e0; 
+}
+
+#extra-availability .availability-item:last-child {
+    border-bottom: none; 
+}
+
+.view-more-btn {
+    background-color: #5aa9ff;;
+    color: black;
+    border: none;
+    padding: 5px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: inline-block;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.view-more-btn:hover {
+    background-color: #0056b3; 
+}
+
+.view-more-btn:active {
+    background-color: #004494;
+    transform: scale(0.98); 
+}
+
+
+.availability-day {
+    font-weight: bold;
+    color: #333;
+}
+
+.availability-time {
+    font-size: 14px;
+    color: #555;
+}
+
+.tutor-email img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+}
+
+.tutor-email a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.tutor-email:hover {
+    background: #e3efff;
+}
+
+.tutor-email a:hover {
+    color: #0056b3;
+}
+
+
+.credential-text {
+    font-weight: bold;
+    flex: 1;
+}
+
+.credential-attachment {
+    color: red;
+    text-decoration: none;
+}
+
+
+.fill {
+    background: #494949;
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.6s ease-in-out;
+}
+
+.location {
+    color: #040404;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+    .profile-container {
+        width: 85%;
+         
+        flex-direction: column;
+        padding: 30px;
+    }
+
+    .profile-left {
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 30px;
+        margin-bottom: 30px;
+    }
+
+    .profile-right {
+        padding-left: 0;
+    }
+
+    .profile-buttons {
+        flex-direction: column;
+    }
+
+    .message-btn,
+    .schedule-btn {
+        width: 100%;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 20px;
+     
+    }
+
+    
+
+    .profile-image img {
+        width: 180px;
+    }
+
+    .profile-title {
+        font-size: 24px;
+    }
+
+    .profile-desc {
+        font-size: 14px;
+    }
+
+    .teaching-info p {
+        font-size: 16px;
+    }
+
+    .expertise h3 {
+        font-size: 18px;
+    }
+
+    .progress-bar span {
+        font-size: 14px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-container {
+        width: 95%;
+    }
+
+    .profile-image img {
+        width: 150px;
+    }
+
+    .profile-title {
+        font-size: 22px;
+    }
+
+    .profile-buttons {
+        flex-direction: column;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+}

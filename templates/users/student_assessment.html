@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Assessment</title>
+    <link rel="stylesheet" href="{% static 'css/student_assessment.css' %}">
+</head>
+
+{% include 'users/navigation.html' %}
+<body>
+
+    <div class="assessment-container">
+        <div class="assessment-card">
+            <h2>ASSESSMENT QUESTIONS</h2>
+
+            <form id="assessment-form" method="POST">
+                {% csrf_token %}
+
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+
+                <div class="question-wrapper">
+                    {% for question in questions %}
+                        <div class="question-block" data-question-id="{{ question.id }}">
+                            <p class="question-text">{{ question.question_text }}</p>
+                    
+                            <div class="answers">
+                                {% for answer in question.choices.all %}
+                                    <button type="button" class="answer-btn"
+                                        data-question-id="{{ question.id }}"
+                                        data-answer-id="{{ answer.id }}"
+                                        onclick="selectAnswer(this)">
+                                        {{ answer.text }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+
+                       
+                            <input type="hidden" name="answers" id="selected-answer-{{ question.id }}">
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+              
+                <div class="buttons">
+                    <button type="button" id="prev-btn" class="nav-btn" disabled>Back</button>
+                    <button type="button" id="next-btn" class="nav-btn">Next</button>
+                    <button type="submit" id="submit-btn" class="nav-btn" style="display: none;">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/assessment.js' %}"></script>
+</body>
+</html>
